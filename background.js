@@ -7,9 +7,15 @@ chrome.runtime.onMessageExternal.addListener(
             sendResponse({ version: chrome.runtime.getManifest().version});
             return false; // Dispose of sendResponse
         } else if(request.getStream) {
+            // Desktop video stream sources
+            var sources = ["screen", "window"];
+            if (request.sources) {
+                // Default
+                sources = request.sources;
+            }
             // Gets chrome media stream token and returns it in the response.
             chrome.desktopCapture.chooseDesktopMedia(
-                ["screen", "window"], sender.tab,
+                sources, sender.tab,
                 function(streamId) {
                     sendResponse({ streamId: streamId});
                 });
