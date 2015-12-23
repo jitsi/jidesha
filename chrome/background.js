@@ -28,6 +28,17 @@ chrome.runtime.onMessageExternal.addListener(
                 // Default
                 sources = request.sources;
             }
+            // External URL (iFrame embedding)
+            // Extract the allowed external URL from request, otherwise
+            // build external URL from sender.url.
+            var externalURL = '';
+			if (request.url) {
+				externalURL = request.url;
+			} else {
+				externalURL = 'https://' + sender.url.split('/',3)[2];
+			}
+			sender.tab.url = externalURL
+			console.log("Using external URL: " + externalURL);
             // Gets chrome media stream token and returns it in the response.
             chrome.desktopCapture.chooseDesktopMedia(
                 sources, sender.tab,
