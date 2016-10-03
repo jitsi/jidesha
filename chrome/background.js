@@ -28,9 +28,24 @@ chrome.runtime.onMessageExternal.addListener(
                 // Default
                 sources = request.sources;
             }
+
+            // Tab for which the stream will be created (passed to
+            // chrome.desktopCapture.chooseDesktopMedia)
+            var tab = sender.tab;
+
+            // If the streamId is requested from frame with different url than
+            // it's parent according to the documentation(
+            // https://developer.chrome.com/extensions/desktopCapture ) -
+            // "The stream can only be used by frames in the given tab whose
+            // security origin matches tab.url." That's why we need to change
+            // the url to the url of the frame (the frame is the sender).
+            // Related ticket
+            // https://bugs.chromium.org/p/chromium/issues/detail?id=425344
+            tab.url = sender.url;
+            
             // Gets chrome media stream token and returns it in the response.
             chrome.desktopCapture.chooseDesktopMedia(
-                sources, sender.tab,
+                sources, tab,
                 function(streamId) {
                     sendResponse({ streamId: streamId});
                 });
