@@ -4,8 +4,12 @@ set -e
 #space-separated list of domains
 DOMAINS=""
 
-# ID of the extension. Do not reuse.
+# The ID of the extension. This is to be chosen for the particular deployment and
+# is used to allow applications (e.g. jitsi-meet) to detect whether the 
+# extension they need is installed. The same ID should not be used for different
+# deployments.
 # See https://developer.mozilla.org/en-US/Add-ons/Install_Manifests for requirements
+# for the format.
 EXT_ID=""
 
 CONTENT_ROOT=`echo $EXT_ID | tr @ .`
