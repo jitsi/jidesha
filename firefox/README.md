@@ -1,7 +1,7 @@
 An extension for Firefox which adds domains to the screen sharing whitelist.
 
 ## Building the XPI
-Edit ```make.sh``` and set the DOMAINS and EXT_ID variable. Then run make.sh. This will produce the extension in a file named ```jidesha.xpi```.
+Edit ```make.sh``` and set the DOMAINS and EXT_ID variables (see comments in ```make.sh``` for further instructiona). Then run make.sh. This will produce the extension in a file named ```jidesha.xpi```.
 
 ## Function
 When the extension is installed (or enabled) it adds the configured domains to the whitelist for screen sharing under the following Mozilla preference:
