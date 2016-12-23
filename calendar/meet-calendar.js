@@ -24,6 +24,13 @@ function getMeetingId() {
     var url;
     if (ix != -1 && (url = inviteText.substring(ix)) && url.length > 0) {
         meetingId = url.substring(BASE_URL.length);
+
+        // there can be ',' after the meeting, normally added when adding
+        // physical rooms to the meeting
+        var regexp = /([a-zA-Z]+).*/g;
+        var match = regexp.exec(meetingId);
+        if (match && match.length > 1)
+            meetingId = match[1];
     }
     else {
         meetingId = generateRoomWithoutSeparator();
