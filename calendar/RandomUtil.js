@@ -10,6 +10,12 @@ var ALPHANUM = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var HEX_DIGITS = '0123456789abcdef';
 
 /**
+ * Digits.
+ * @const
+ */
+var DIGITS = '0123456789';
+
+/**
  * Generates random int within the range [min, max]
  * @param min the minimum value for the generated number
  * @param max the maximum value for the generated number
@@ -59,6 +65,18 @@ function randomHexString(len) {
     var ret = '';
     while (len--) {
         ret += this.randomHexDigit();
+    }
+    return ret;
+}
+
+/**
+ * Returns a random string of digits with length 'len'.
+ * @param len the length.
+ */
+function randomDigitString(len) {
+    var ret = '';
+    while (len--) {
+        ret += this.randomElement(DIGITS);
     }
     return ret;
 }
