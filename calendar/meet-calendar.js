@@ -7,41 +7,351 @@ var NUMBERS = [];
 var generateRoomNameAsDigits = false;
 
 /**
- * Checks for the button on current page
+ * The event page we will be updating.
  */
-function isButtonPresent() {
-    return ($('#jitsi_button').length >= 1);
+class EventContainer {
+    constructor() {
+    }
+
+    /**
+     * @returns {EventContainer}
+     */
+    static getInstance() {
+        var eventEditPage = document.querySelector('#maincell #coverinner');
+        if (eventEditPage)
+            return new GEvent(eventEditPage);
+        else
+            return null;
+    }
+
+    /**
+     * The description of the event.
+     * @returns {Description}
+     */
+    get description() {}
+
+    /**
+     * The button container where we will add the jitsi button.
+     */
+    get buttonContainer() {}
+
+    /**
+     * The location of the event.
+     * @returns {Location}
+     */
+    get location() {}
+
+    /**
+     * The container element of the event edit page.
+     * @returns {*}
+     */
+    get container(){
+        return this.containerElement;
+    };
+
+    set container(c){
+        this.containerElement = c;
+    };
+
+    update() {}
+
+    /**
+     * Checks for the button on current page
+     */
+    isButtonPresent() {
+        return ($('#jitsi_button').length >= 1);
+    }
+
+    /**
+     * Checks if there is meetingId, if not generate it, otherwise return it.
+     * @returns {string} the meeting id to use.
+     */
+    getMeetingId() {
+        var meetingId = "";
+        var inviteText = this.location.text;
+
+        var ix = inviteText.indexOf(BASE_URL);
+        var url;
+        if (ix != -1 && (url = inviteText.substring(ix)) && url.length > 0) {
+            meetingId = url.substring(BASE_URL.length);
+
+            // there can be ',' after the meeting, normally added when adding
+            // physical rooms to the meeting
+            var regexp = /([a-zA-Z]+).*/g;
+            var match = regexp.exec(meetingId);
+            if (match && match.length > 1)
+                meetingId = match[1];
+        }
+        else {
+            if (generateRoomNameAsDigits) {
+                meetingId = randomDigitString(10);
+            }
+            else
+                meetingId = generateRoomWithoutSeparator();
+        }
+
+        return meetingId;
+    }
+
+    /**
+     * Adds the jitsi button in buttonContainer.
+     */
+    addsJitsiButton() {
+        var container = this.buttonContainer;
+        if (!container)
+            return;
+
+        var description = this.description;
+
+        if (!description.element)
+            return;
+
+        container.addClass('button_container');
+        container.append(
+            '<div id="jitsi_button"><a href="#" style="color: white"></a></div>');
+        // container.find('div.ui-sch').addClass('hangouts_button');
+        description.update(this.location);
+    }
 }
 
 /**
- * Checks if there is meetingId, if not generate it, otherwise return it.
- * @returns {string} the meeting id to use.
+ * Represents the location field.
  */
-function getMeetingId() {
-    var meetingId = "";
-    var inviteText = $('[id*=location].ep-dp-input input').val();
+class Location {
+    /**
+     * The text in the location field.
+     */
+    get text() {}
 
-    var ix = inviteText.indexOf(BASE_URL);
-    var url;
-    if (ix != -1 && (url = inviteText.substring(ix)) && url.length > 0) {
-        meetingId = url.substring(BASE_URL.length);
-
-        // there can be ',' after the meeting, normally added when adding
-        // physical rooms to the meeting
-        var regexp = /([a-zA-Z]+).*/g;
-        var match = regexp.exec(meetingId);
-        if (match && match.length > 1)
-            meetingId = match[1];
+    /**
+     * A text to be used when adding info to the location field.
+     * @returns {string}
+     */
+    static getLocationText() {
+        return APP_NAME + ' Conference';
     }
-    else {
-        if (generateRoomNameAsDigits) {
-            meetingId = randomDigitString(10);
+
+    /**
+     * Adds location info.
+     * @param text
+     */
+    addLocationText(text){}
+}
+
+/**
+ * Represents the description of the event.
+ */
+class Description {
+    /**
+     * Updates the description and location field is not already updated.
+     * @param location
+     */
+    update(location) {
+        var isDescriptionUpdated = false;
+
+        // checks whether description was updated.
+        if (this.element != undefined) {
+            var descriptionContainsURL =
+                (this.value.length >= 1 && this.value.indexOf(BASE_URL) !== -1);
+            isDescriptionUpdated =
+                descriptionContainsURL ||
+                // checks whether there is the generated name in the location input
+                (location.text.indexOf(Location.getLocationText()) != -1);
         }
-        else
-            meetingId = generateRoomWithoutSeparator();
+
+        if(isDescriptionUpdated) {
+            // update button url of event has all the data
+            updateButtonURL();
+        } else {
+            // update button as event description has no meeting set
+            var button = $('#jitsi_button a');
+            button.html('Add a ' + APP_NAME + ' Meeting');
+            button.attr('href', '#');
+            button.on('click', e => {
+                e.preventDefault();
+
+                if (!isDescriptionUpdated) {
+                    // Build the invitation content
+                    this.addDescriptionText(getInviteText());
+                    updateButtonURL();
+
+                    location.addLocationText(
+                        Location.getLocationText() + ' - '
+                            + $('#jitsi_button a').attr('href'));
+                }
+                updateButtonURL();
+            });
+        }
     }
 
-    return meetingId;
+    /**
+     * The description html element.
+     */
+    get element() {}
+
+    /**
+     * The text value of the description of the event.
+     */
+    get value() {}
+
+    /**
+     * Adds description text to the existing text.
+     * @param text
+     */
+    addDescriptionText(text){}
+}
+
+/**
+ * The google calendar specific implementation of the event page.
+ */
+class GEvent extends EventContainer {
+    constructor(eventEditPage) {
+        super();
+
+        this.container = eventEditPage;
+    }
+
+    /**
+     * Updates content (adds the button if is not there).
+     * This is the entry point for all page modifications.
+     */
+    update() {
+        if ($('table.ep-dp-dt').is(":visible")) {
+            meetingId = this.getMeetingId();
+
+            if(!this.isButtonPresent())
+                this.addsJitsiButton();
+        }
+    }
+
+    /**
+     * The event location.
+     * @returns {GLocation}
+     */
+    get location() {
+        return new GLocation();
+    }
+
+    /**
+     * The button container holding jitsi button.
+     * @returns {*}
+     */
+    get buttonContainer() {
+        var container = $(getNodeID('rtc'));
+        if(container.length == 0)
+            return null;
+        return container;
+    }
+
+    /**
+     * The event description.
+     * @returns {GDescription}
+     */
+    get description() {
+        return new GDescription();
+    }
+
+    /**
+     * Adds the jitsi button.
+     */
+    addsJitsiButton() {
+        super.addsJitsiButton();
+
+        var rtcRow = $(getNodeID('rtc-row'));
+        if(rtcRow.is(':visible') == false && description.length != 0) {
+            rtcRow.show();
+            this.buttonContainer.addClass('solo');
+        }
+    }
+}
+
+/**
+ * The google calendar specific implementation of the location field in the
+ * event page.
+ */
+class GLocation extends Location {
+    constructor() {
+        super();
+        this.elem = $('[id*=location].ep-dp-input input');
+    }
+
+    /**
+     * The text from the location input field.
+     * @returns {*}
+     */
+    get text() {
+        return this.elem.val();
+    }
+
+    /**
+     * Adds text to location input.
+     * @param text
+     */
+    addLocationText(text){
+        // Set the location if there is content
+        var locationNode = this.elem[0];
+        if (locationNode) {
+            locationNode.dispatchEvent(getKeyboardEvent('keydown'));
+            locationNode.value = locationNode.value == '' ?
+                text : locationNode.value + ', ' + text;
+            locationNode.dispatchEvent(getKeyboardEvent('input'));
+            locationNode.dispatchEvent(getKeyboardEvent('keyup'));
+            var changeEvt2 = document.createEvent("HTMLEvents");
+            changeEvt2.initEvent('change', false, true);
+            locationNode.dispatchEvent(changeEvt2);
+        }
+    }
+}
+
+/**
+ * The google calendar specific implementation of the description textarea in
+ * the event page.
+ */
+class GDescription extends Description {
+    constructor() {
+        super();
+
+        var description = $(getNodeID('descript textarea'))[0];
+        var descriptionRow = $(getNodeID('descript-row'));
+
+        if (descriptionRow.find('textarea').length === 0)
+            return;
+
+        this.element = description;
+    }
+
+    /**
+     * The html element.
+     * @returns {*}
+     */
+    get element() {
+        return this.el;
+    }
+
+    set element(el) {
+        this.el = el;
+    }
+
+    /**
+     * The text value of the description.
+     */
+    get value() {
+        return this.el.value;
+    }
+
+    /**
+     * Adds text to the description.
+     * @param text
+     */
+    addDescriptionText(text){
+        this.el.dispatchEvent(getKeyboardEvent('keydown'));
+        this.el.value = this.el.value + text;
+        this.el.dispatchEvent(getKeyboardEvent('input'));
+        this.el.dispatchEvent(getKeyboardEvent('keyup'));
+        var changeEvt1 = document.createEvent("HTMLEvents");
+        changeEvt1.initEvent('change', false, true);
+        this.el.dispatchEvent(changeEvt1);
+    }
 }
 
 /**
@@ -107,9 +417,6 @@ function getInviteText() {
  */
 function updateButtonURL() {
     try {
-        var container = $(getNodeID('rtc'));
-        container.find('div.ui-sch').addClass('hangouts_button');
-
         $('#jitsi_button').addClass('join');
         var button = $('#jitsi_button a');
         button.html("Join " + meetingId + " now");
@@ -123,125 +430,22 @@ function updateButtonURL() {
 }
 
 /**
- * Updates event and the button state based on whether the user had already
- * clicked the jitsi button and there is a change in the location and in the
- * description of the event.
- * @param description the description element.
- */
-function updateEvent(description) {
-
-    var descriptionContainsURL = false;
-    var isDescriptionUpdated = false;
-
-    if (description != undefined) {
-        // checks whether there is an url in the description
-        descriptionContainsURL =
-            (description.value.length >= 1
-                && description.value.indexOf(BASE_URL) !== -1);
-        isDescriptionUpdated =
-            descriptionContainsURL ||
-            // checks whether there is the generated name in the location input
-            ($('[id*=location].ep-dp-input input').val()
-                .indexOf(APP_NAME + ' Video Conference') != -1)
-    }
-
-    if(isDescriptionUpdated) {
-        updateButtonURL();
-    } else {
-        var button = $('#jitsi_button a');
-        button.html('Add a ' + APP_NAME + ' Meeting');
-        button.attr('href', '#');
-        button.on('click', function(e) {
-            e.preventDefault();
-            $(getNodeID('rtc'))
-                .find('div.ui-sch').addClass('hangouts_button');
-
-            if (!isDescriptionUpdated) {
-                // Build the invitation content
-                description.dispatchEvent(getKeyboardEvent('keydown'));
-                description.value = description.value + getInviteText();
-                description.dispatchEvent(getKeyboardEvent('input'));
-                description.dispatchEvent(getKeyboardEvent('keyup'));
-                var changeEvt1 = document.createEvent("HTMLEvents");
-                changeEvt1.initEvent('change', false, true);
-                description.dispatchEvent(changeEvt1);
-                updateButtonURL();
-
-                // Set the location if there is content
-                var locationNode = $(getNodeID('location input'))[0];
-                if (locationNode) {
-                    var locationText =
-                        APP_NAME + ' Conference - '
-                            + $('#jitsi_button a').attr('href');
-                    locationNode.dispatchEvent(getKeyboardEvent('keydown'));
-                    locationNode.value = locationNode.value == '' ?
-                        locationText : locationNode.value + ', ' + locationText;
-                    locationNode.dispatchEvent(getKeyboardEvent('input'));
-                    locationNode.dispatchEvent(getKeyboardEvent('keyup'));
-                    var changeEvt2 = document.createEvent("HTMLEvents");
-                    changeEvt2.initEvent('change', false, true);
-                    locationNode.dispatchEvent(changeEvt2);
-                }
-            }
-            updateEvent(description);
-        });
-    }
-}
-
-/**
- * Adds the button that will add description and url.
- */
-function addsJitsiButton() {
-    var container = $(getNodeID('rtc'));
-    if(container.length == 0)
-        return;
-
-    var description = $(getNodeID('descript textarea'))[0];
-    var descriptionRow = $(getNodeID('descript-row'));
-
-    if (descriptionRow.find('textarea').length === 0)
-        return;
-
-    container.addClass('button_container');
-
-    if(isButtonPresent()) {
-        updateEvent(description);
-    } else {
-        container.find('div.ui-sch').addClass('hangouts_button');
-        container.append('<div id="jitsi_button"><a href="#" style="color: white"></a></div>');
-        updateEvent(description);
-    }
-
-    var rtcRow = $(getNodeID('rtc-row'));
-    if(rtcRow.is(':visible') == false && description.length != 0) {
-        rtcRow.show();
-        container.addClass('solo');
-    }
-}
-
-/**
  * Checks whether it is ok to add the button to current page and add it.
  */
 function checkAndUpdateCalendar() {
     var MutationObserver
         = window.MutationObserver || window.WebKitMutationObserver;
-    var eventEditPage = document.querySelector('#maincell #coverinner');
-    if (eventEditPage) {
+    var c = EventContainer.getInstance();
+    if (c) {
         new MutationObserver(function(mutations) {
             try {
                 mutations.every(function() {
-                    if ($('table.ep-dp-dt').is(":visible")) {
-                        meetingId = getMeetingId();
-                        if(!isButtonPresent())
-                            addsJitsiButton();
-                        return false;
-                    }
-                    return true;
+                    c.update();
                 });
             } catch(e) {
                 console.log(e);
             }
-        }).observe(eventEditPage, {
+        }).observe(c.container, {
             childList: true, attributes: true, characterData: false });
     }
 }
