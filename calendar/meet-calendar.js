@@ -21,7 +21,7 @@ class EventContainer {
         if (eventEditPage)
             return new GEvent(eventEditPage);
         else
-            return null;
+            return new MSLiveEvent();
     }
 
     /**
@@ -68,7 +68,12 @@ class EventContainer {
      */
     getMeetingId() {
         var meetingId = "";
-        var inviteText = this.location.text;
+
+        var inviteText;
+        if (this.location)
+            inviteText = this.location.text;
+        else
+            inviteText = this.description.value;
 
         var ix = inviteText.indexOf(BASE_URL);
         var url;
@@ -156,7 +161,9 @@ class Description {
             isDescriptionUpdated =
                 descriptionContainsURL ||
                 // checks whether there is the generated name in the location input
-                (location.text.indexOf(Location.getLocationText()) != -1);
+                // if there is a location
+                (location != null
+                    && location.text.indexOf(Location.getLocationText()) != -1);
         }
 
         if(isDescriptionUpdated) {
@@ -175,9 +182,10 @@ class Description {
                     this.addDescriptionText(getInviteText());
                     updateButtonURL();
 
-                    location.addLocationText(
-                        Location.getLocationText() + ' - '
-                            + $('#jitsi_button a').attr('href'));
+                    if (location)
+                        location.addLocationText(
+                            Location.getLocationText() + ' - '
+                                + $('#jitsi_button a').attr('href'));
                 }
                 updateButtonURL();
             });
@@ -351,6 +359,101 @@ class GDescription extends Description {
         var changeEvt1 = document.createEvent("HTMLEvents");
         changeEvt1.initEvent('change', false, true);
         this.el.dispatchEvent(changeEvt1);
+    }
+}
+
+/**
+ * The outlook live calendar specific implementation of the event page.
+ */
+class MSLiveEvent extends EventContainer {
+    constructor() {
+        super();
+
+        this.container = document.getElementsByTagName("BODY")[0];
+    }
+
+    /**
+     * Updates content (adds the button if is not there).
+     * This is the entry point for all page modifications.
+     */
+    update() {
+        if ($("div[aria-label='Event compose form']").is(":visible")) {
+            meetingId = this.getMeetingId();
+
+            if(!this.isButtonPresent())
+                this.addsJitsiButton();
+        }
+    }
+
+    /**
+     * The event location. Currently not supported.
+     * @returns {MSLiveLocation}
+     */
+    get location() {
+        return null;
+    }
+
+    /**
+     * The button container holding jitsi button.
+     * @returns {*}
+     */
+    get buttonContainer() {
+        var container
+            = $("span[id='MeetingCompose.LocationInputLabel']").parent();
+        if(container.length == 0)
+            return null;
+        return container;
+    }
+
+    /**
+     * The event description.
+     * @returns {MSLiveDescription}
+     */
+    get description() {
+        return new MSLiveDescription();
+    }
+}
+
+/**
+ * The outlook live calendar specific implementation of the description textarea
+ * in the event page.
+ */
+class MSLiveDescription extends Description {
+    constructor() {
+        super();
+
+        var description = $("div[aria-label='Event body'] p:first-child");
+        if (description.length == 0)
+            return;
+
+        this.element = description;
+    }
+
+    /**
+     * The html element.
+     * @returns {*}
+     */
+    get element() {
+        return this.el[0];
+    }
+
+    set element(el) {
+        this.el = el;
+    }
+
+    /**
+     * The text value of the description.
+     */
+    get value() {
+        return this.el.text();
+    }
+
+    /**
+     * Adds text to the description.
+     * @param text
+     */
+    addDescriptionText(text){
+        this.el.text(this.value + text);
     }
 }
 
