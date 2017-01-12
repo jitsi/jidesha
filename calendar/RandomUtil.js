@@ -71,12 +71,21 @@ function randomHexString(len) {
 
 /**
  * Returns a random string of digits with length 'len'.
+ * The string will be with random numbers of count 'len' - 2, and the last
+ * two digits will be a check sum using the "ISO 7064 Mod 97,10" algorithm.
+ * In order to verify it the formula is:
+ * (num_to_check % 97) == 1
  * @param len the length.
  */
 function randomDigitString(len) {
     var ret = '';
-    while (len--) {
+    var randomLen = len - 2;
+    while (randomLen--) {
         ret += this.randomElement(DIGITS);
     }
-    return ret;
+    var num = parseInt(ret);
+    var verifyNumber = (98 - (num * 100) % 97) % 97;
+    return num.toString()
+        + (verifyNumber < 10 ? '0' : '') // adds leading zero if single digit
+        + verifyNumber.toString();
 }
