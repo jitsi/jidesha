@@ -1,15 +1,4 @@
 /**
- * @const
- */
-var ALPHANUM = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-/**
- * Hexadecimal digits.
- * @const
- */
-var HEX_DIGITS = '0123456789abcdef';
-
-/**
  * Digits.
  * @const
  */
@@ -32,41 +21,6 @@ function randomInt(min, max) {
  */
 function randomElement(arr) {
     return arr[randomInt(0, arr.length -1)];
-}
-
-/**
- * Generate random alphanumeric string.
- * @param {number} length expected string length
- * @returns {string} random string of specified length
- */
-function randomAlphanumStr(length) {
-    var result = '';
-
-    for (var i = 0; i < length; i += 1) {
-        result += randomElement(ALPHANUM);
-    }
-
-    return result;
-}
-
-/**
- * Returns a random hex digit.
- * @returns {*}
- */
-function randomHexDigit() {
-    return randomElement(HEX_DIGITS);
-}
-
-/**
- * Returns a random string of hex digits with length 'len'.
- * @param len the length.
- */
-function randomHexString(len) {
-    var ret = '';
-    while (len--) {
-        ret += this.randomHexDigit();
-    }
-    return ret;
 }
 
 /**
