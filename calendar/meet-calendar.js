@@ -1,5 +1,6 @@
 const BASE_URL = "https://meet.jit.si/";
 const APP_NAME = "Jitsi";
+const NUMBER_RETRIEVE_SCRIPT = false;
 
 //A text to be used when adding info to the location field.
 const LOCATION_TEXT = APP_NAME + ' Conference';
@@ -73,10 +74,27 @@ class EventContainer {
     }
 
     /**
+     * Clears instances.
+     */
+    reset() {
+        this.descriptionInstance = null;
+        this.locationInstance = null;
+    }
+
+    /**
      * Checks if there is meetingId, if not generate it, otherwise return it.
      * @returns {string} the meeting id to use.
      */
     getMeetingId() {
+
+        if (!this.isButtonPresent()) {
+            // there is no button present we will add it, so we will clean
+            // the state of the EventContainer, so we can update all values.
+            // this clears the states between creating/editing different events
+            // we add the button
+            this.reset();
+        }
+
         let resMeetingId = "";
 
         var inviteText;
@@ -98,6 +116,21 @@ class EventContainer {
                 resMeetingId = match[1];
         }
         else {
+            if(NUMBER_RETRIEVE_SCRIPT) {
+                // queries a predefined location for settings
+                $.getJSON(NUMBER_RETRIEVE_SCRIPT,
+                    jsonobj => {
+                        this.inviteTextTemplate = jsonobj.inviteTextTemplate;
+
+                        if(!jsonobj.numbersEnabled)
+                            return;
+
+                        this.numbers = jsonobj.numbers;
+                        this.inviteNumbersTextTemplate
+                            = jsonobj.inviteNumbersTextTemplate;
+                    });
+            }
+
             if (generateRoomNameAsDigits) {
                 resMeetingId = randomDigitString(10);
             }
@@ -223,20 +256,44 @@ class Description {
      * @returns {String}
      */
     getInviteText() {
-        var inviteText =
-            "Click the following link to join the meeting from your computer: "
-            + BASE_URL + this.event.meetingId;
+        let inviteText;
+        let hasTemplate = false;
+
+        if (this.event.inviteTextTemplate) {
+            inviteText = this.event.inviteTextTemplate;
+            hasTemplate = true;
+        } else {
+            inviteText =
+                "Click the following link to join the meeting " +
+                "from your computer: " + BASE_URL + this.event.meetingId;
+        }
 
         if (this.event.numbers.length > 0) {
-            inviteText += "\n\n=====";
-            inviteText +="\n\nJust want to dial in on your phone? ";
-            inviteText += " \n\nCall one of the following numbers: ";
-            this.event.numbers.forEach(function (num) {
-                inviteText += "\n" + num;
-            });
-            inviteText += "\n\nSay your conference name: '"
-                + this.event.meetingId
-                + "' and you will be connected!";
+
+            if (this.event.inviteNumbersTextTemplate) {
+                inviteText += this.event.inviteNumbersTextTemplate;
+                hasTemplate = true;
+                for (var i = 0; i < this.event.numbers.length; i++) {
+                    inviteText = inviteText.replace(
+                        '{' + i + '}', this.event.numbers[i]);
+                }
+            } else {
+                inviteText += "\n\n=====";
+                inviteText +="\n\nJust want to dial in on your phone? ";
+                inviteText += " \n\nCall one of the following numbers: ";
+                this.event.numbers.forEach(function (num) {
+                    inviteText += "\n" + num;
+                });
+                inviteText += "\n\nSay your conference name: '"
+                    + this.event.meetingId
+                    + "' and you will be connected!";
+            }
+        }
+
+        if (hasTemplate) {
+            inviteText = inviteText.replace(/\{BASE_URL\}/g, BASE_URL);
+            inviteText
+                = inviteText.replace(/\{MEETING_ID\}/g, this.event.meetingId);
         }
 
         return inviteText;
