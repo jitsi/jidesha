@@ -288,7 +288,9 @@ class GEvent extends EventContainer {
      * @returns {GLocation}
      */
     get location() {
-        return new GLocation();
+        if (!this.locationInstance)
+            this.locationInstance = new GLocation();
+        return this.locationInstance;
     }
 
     /**
@@ -307,7 +309,9 @@ class GEvent extends EventContainer {
      * @returns {GDescription}
      */
     get description() {
-        return new GDescription(this);
+        if (!this.descriptionInstance)
+            this.descriptionInstance = new GDescription(this);
+        return this.descriptionInstance;
     }
 
     /**
@@ -461,7 +465,9 @@ class MSLiveEvent extends EventContainer {
      * @returns {MSLiveDescription}
      */
     get description() {
-        return new MSLiveDescription(this);
+        if (!this.descriptionInstance)
+            this.descriptionInstance = new MSLiveDescription(this);
+        return this.descriptionInstance;
     }
 }
 
