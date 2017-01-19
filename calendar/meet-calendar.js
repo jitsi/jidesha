@@ -157,7 +157,6 @@ class EventContainer {
         container.addClass('button_container');
         container.append(
             '<div id="jitsi_button"><a href="#" style="color: white"></a></div>');
-        // container.find('div.ui-sch').addClass('hangouts_button');
         description.update(this.location);
     }
 }
@@ -355,10 +354,20 @@ class GEvent extends EventContainer {
      * @returns {*}
      */
     get buttonContainer() {
-        var container = $(getNodeID('rtc'));
-        if(container.length == 0)
+        // we will create a new raw to place the button
+        // this row will be after the Video Call row
+        let neighbor = $(getNodeID('rtc-row'));
+        if(neighbor.length == 0)
             return null;
-        return container;
+
+        let newRowID = getNodePrefix() + '.' + 'jitsi-rtc-row';
+        let newRow = $('<tr id="' + newRowID + '">' +
+                        '<th class="ep-dp-dt-th"></th>' +
+                        '<td class="ep-dp-dt-td"></td>' +
+                       '</tr>');
+        newRow.insertAfter(neighbor);
+
+        return newRow.find('td');
     }
 
     /**
@@ -575,12 +584,19 @@ class MSLiveDescription extends Description {
  * Returns the node id.
  */
 function getNodeID(name) {
-    var inputNodePrefix = '';
+    return '#\\' + getNodePrefix() + '\\.' + name;
+}
+
+/**
+ * Returns the prefix to use for nodes.
+ * @returns {*}
+ */
+function getNodePrefix() {
     var labelNode = $("[id*='location-label']");
     if (labelNode.length >= 1) {
-        inputNodePrefix = labelNode[0].id.split('.')[0];
+        return labelNode[0].id.split('.')[0];
     }
-    return '#\\' + inputNodePrefix + '\\.' + name;
+    return '';
 }
 
 /**
