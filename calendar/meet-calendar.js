@@ -211,7 +211,7 @@ class Description {
         } else {
             // update button as event description has no meeting set
             var button = $('#jitsi_button a');
-            button.html('Add a ' + APP_NAME + ' Meeting');
+            button.html(' Add a ' + APP_NAME + ' Meeting');
             button.attr('href', '#');
             button.on('click', e => {
                 e.preventDefault();
@@ -305,7 +305,7 @@ class Description {
         try {
             $('#jitsi_button').addClass('join');
             var button = $('#jitsi_button a');
-            button.html("Join " + this.event.meetingId + " now");
+            button.html(" Join " + this.event.meetingId + " now");
             button.off('click');
             button.attr('href', BASE_URL + this.event.meetingId);
             button.attr('target', '_new');
@@ -474,6 +474,11 @@ class GDescription extends Description {
      */
     addDescriptionText(text){
         this.el.dispatchEvent(getKeyboardEvent('keydown'));
+
+        // if there is already text in the description append on new line
+        if (this.el.value)
+            this.el.value = this.el.value + '\n';
+
         this.el.value = this.el.value + text;
         this.el.dispatchEvent(getKeyboardEvent('input'));
         this.el.dispatchEvent(getKeyboardEvent('keyup'));
