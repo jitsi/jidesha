@@ -211,7 +211,7 @@ class Description {
         } else {
             // update button as event description has no meeting set
             var button = $('#jitsi_button a');
-            button.html(' Add a ' + APP_NAME + ' Meeting');
+            button.html('Add a ' + APP_NAME + ' Meeting');
             button.attr('href', '#');
             button.on('click', e => {
                 e.preventDefault();
@@ -305,7 +305,7 @@ class Description {
         try {
             $('#jitsi_button').addClass('join');
             var button = $('#jitsi_button a');
-            button.html(" Join " + this.event.meetingId + " now");
+            button.html("Join " + this.event.meetingId + " now");
             button.off('click');
             button.attr('href', BASE_URL + this.event.meetingId);
             button.attr('target', '_new');
