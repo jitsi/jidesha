@@ -162,18 +162,28 @@ function hasTemplate(s) {
 
 /**
  * Generates new room name.
+ * @param customDictionary a dictionary containing keys pluralNouns, verbs,
+ * adverbs and adjectives, values are array of strings.
  */
-
-function generateRoomWithoutSeparator() {
+function generateRoomWithoutSeparator(customDictionary) {
     // Note that if more than one pattern is available, the choice of
     // 'name' won't have a uniform distribution amongst all patterns (names
     // from patterns with fewer options will have higher probability of
     // being chosen that names from patterns with more options).
     var name = randomElement(PATTERNS);
     var word;
+    var categories = CATEGORIES;
+    if (customDictionary) {
+        categories = {
+            "_PLURALNOUN_": customDictionary.pluralNouns,
+            "_VERB_": customDictionary.verbs,
+            "_ADVERB_": customDictionary.adverbs,
+            "_ADJECTIVE_": customDictionary.adjectives
+        };
+    }
     while (hasTemplate(name)) {
-        for (var template in CATEGORIES) {
-            word = randomElement(CATEGORIES[template]);
+        for (var template in categories) {
+            word = randomElement(categories[template]);
             name = name.replace(template, word);
         }
     }

@@ -122,6 +122,13 @@ class EventContainer {
                     jsonobj => {
                         this.inviteTextTemplate = jsonobj.inviteTextTemplate;
 
+                        // if there is a room name dictionary lets use it and
+                        // generate new room name
+                        if (jsonobj.roomNameDictionary) {
+                            this.meetingId = generateRoomWithoutSeparator(
+                                    jsonobj.roomNameDictionary);
+                        }
+
                         if(!jsonobj.numbersEnabled)
                             return;
 
