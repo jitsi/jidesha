@@ -1,6 +1,8 @@
-const BASE_URL = "https://meet.jit.si/";
+const BASE_DOMAIN = "meet.jit.si";
+const BASE_URL = "https://" + BASE_DOMAIN + "/";
 const APP_NAME = "Jitsi";
 const NUMBER_RETRIEVE_SCRIPT = false;
+const CONFERENCE_MAPPER_SCRIPT = false;
 
 //A text to be used when adding info to the location field.
 const LOCATION_TEXT = APP_NAME + ' Conference';
@@ -226,7 +228,24 @@ class Description {
 
                 if (!isDescriptionUpdated) {
                     // Build the invitation content
-                    this.addDescriptionText(this.getInviteText());
+                    if (CONFERENCE_MAPPER_SCRIPT) {
+                        // queries a predefined location for settings
+                        $.getJSON(CONFERENCE_MAPPER_SCRIPT
+                                + "?conference=" + this.event.meetingId + "@conference." + BASE_DOMAIN,
+                            jsonobj => {
+                                if (jsonobj.conference && jsonobj.id) {
+                                    this.addDescriptionText(
+                                        this.getInviteText(jsonobj.id));
+                                }
+                                else {
+                                    this.addDescriptionText(
+                                        this.getInviteText());
+                                }
+                            });
+                    }
+                    else {
+                        this.addDescriptionText(this.getInviteText());
+                    }
                     this.updateButtonURL();
 
                     if (location)
@@ -260,9 +279,10 @@ class Description {
 
     /**
      * Generates description text used for the invite.
+     * @param dialInID optional dial in id
      * @returns {String}
      */
-    getInviteText() {
+    getInviteText(dialInID) {
         let inviteText;
         let hasTemplate = false;
 
@@ -303,6 +323,10 @@ class Description {
             inviteText = inviteText.replace(/\{BASE_URL\}/g, BASE_URL);
             inviteText
                 = inviteText.replace(/\{MEETING_ID\}/g, this.event.meetingId);
+            if (dialInID) {
+                inviteText
+                    = inviteText.replace(/\{DIALIN_ID\}/g, dialInID);
+            }
         }
 
         return inviteText;
