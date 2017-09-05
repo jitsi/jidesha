@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+    <style>
+        body {
+            overflow-x: hidden;
+            font-family: -apple-system,
+                        BlinkMacSystemFont,
+                        "Segoe UI",
+                        "Roboto",
+                        "Noto Sans",
+                        "Ubuntu",
+                        "Droid Sans",
+                        "Helvetica Neue",
+                        sans-serif;
+            font-size: 14px;
+        }
+
+        #menu > div {
+            display: block;
+            width: 260px;
+            height: 32px;
+            padding: 4px 12px 0px 12px;
+            background-color: #FFFFFF;
+            color: #172B4D;
+        }
+        #menu > div:hover {
+            background-color: #F4F5F7;
+        }
+
+        #menu > div:focus {
+            background-color: #EBECF0;
+            color: #172B4D;
+            outline: #4C9AFF solid 1px;
+        }
+
+        #menu > div:active {
+            background-color: #B3D4FF;
+        }
+
+        #menu a {
+            display: block;
+            text-decoration: none;
+            vertical-align: middle;
+            line-height: 32px;
+            width: 100%;
+            outline: none;
+        }
+
+        #menu a, #menu a:hover, #menu a:visited {
+            color: #172B4D;
+        }
+
+        #menu a:active {
+            color: #0052CC;
+        }
+
+    </style>
+    <script src="popup.js"></script>
+</head>
+<body>
+    <div id="menu">
+        <div tabindex="1">
+            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&autoCreateMeeting=true">
+                Create Google Calendar meeting
+            </a>
+        </div>
+        <div tabindex="2">
+            <a href="https://outlook.live.com/owa/?path=/calendar/action/compose&autoCreateMeeting=true">
+                Create Outlook 365 Calendar meeting
+            </a>
+        </div>
+    </div>
+</body>
+</html>

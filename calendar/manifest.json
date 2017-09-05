@@ -33,5 +33,9 @@
   "web_accessible_resources": [
     "jitsi-logo-48x48.png",
     "jitsi-logo-white-48x48.png"
-  ]
+  ],
+  "browser_action": {
+    "default_title": "Create Jitsi Meetings",
+    "default_popup": "popup.html"
+  }
 }

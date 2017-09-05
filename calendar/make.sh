@@ -13,3 +13,5 @@ cp ../chrome/background.js target/content
 cp ../chrome/*.png target/content
 cp *.png target/content
 cp *.js target/content
+cp *.html target/content
+
