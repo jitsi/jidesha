@@ -175,9 +175,6 @@ class EventContainer {
 
         var description = this.description;
 
-        if (!description.element)
-            return;
-
         container.addClass('button_container');
         container.append(
             '<div id="jitsi_button"><a href="#" style="color: white"></a></div>');
@@ -436,19 +433,6 @@ class GEvent extends EventContainer {
             this.descriptionInstance = new GDescription(this);
         return this.descriptionInstance;
     }
-
-    /**
-     * Adds the jitsi button.
-     */
-    addJitsiButton() {
-        super.addJitsiButton();
-
-        var rtcRow = $(getNodeID('rtc-row'));
-        if(rtcRow.is(':visible') == false && description.length != 0) {
-            rtcRow.show();
-            this.buttonContainer.addClass('solo');
-        }
-    }
 }
 
 /**
@@ -459,6 +443,15 @@ class GLocation extends Location {
     constructor() {
         super();
         this.elem = $('[id*=location].ep-dp-input input');
+
+        if (this.elem.length === 0) {
+            // this is the case where location is not editable
+            let element = $('[id*=location].ep-dp-input div > div')[0];
+            this.elem = element;
+            this.elem.val = function () {
+                return element.innerHTML;
+            }
+        }
     }
 
     /**
@@ -476,6 +469,16 @@ class GLocation extends Location {
     addLocationText(text){
         // Set the location if there is content
         var locationNode = this.elem[0];
+
+        if (!locationNode) {
+            // this is the case where location was not editable
+            // we click it to make it visible and then replace the element
+            // so we can actually edit it and add the text
+            this.elem.click();
+            this.elem = $('[id*=location].ep-dp-input input');
+            locationNode = this.elem[0];
+        }
+
         if (locationNode) {
             locationNode.dispatchEvent(getKeyboardEvent('keydown'));
             locationNode.value = locationNode.value == '' ?
@@ -500,8 +503,13 @@ class GDescription extends Description {
         var description = $(getNodeID('descript textarea'))[0];
         var descriptionRow = $(getNodeID('descript-row'));
 
-        if (descriptionRow.find('textarea').length === 0)
-            return;
+        if (descriptionRow.find('textarea').length === 0) {
+            // this is the case where description is not editable
+            // when loading the event (no textarea)
+            description = $('[id*="descript"] div > div > div')[0];
+            description.value = description.innerHTML;
+            description.noTextArea = true;
+        }
 
         this.element = description;
     }
@@ -530,6 +538,15 @@ class GDescription extends Description {
      * @param text
      */
     addDescriptionText(text){
+        if (this.el.noTextArea) {
+            // this is the case where description was not editable
+            // so we click on the element to make it editable
+            // and replace the elements do the actual edit can function
+            this.el.click();
+
+            this.element = $(getNodeID('descript textarea'))[0];
+        }
+
         this.el.dispatchEvent(getKeyboardEvent('keydown'));
 
         // if there is already text in the description append on new line
