@@ -615,7 +615,16 @@ class MSLiveDescription extends Description {
      * @param text
      */
     addDescriptionText(text){
-        this.el.text(this.value + text);
+        // format link
+        var urlRegex = /(https?:\/\/[^\s]+)/g;
+        let textToInsert = text.replace(urlRegex, function(url) {
+            return '<a href="' + url + '">' + url + '</a>';
+        });
+
+        // format new lines
+        textToInsert = textToInsert.replace(/(?:\r\n|\r|\n)/g, '<br />');
+
+        this.el.html(this.value + textToInsert);
     }
 }
 
