@@ -1,5 +1,5 @@
 function click(e) {
-    chrome.tabs.create({ url: e.target.href });
+    chrome.tabs.create({ url: e.target.href + '&extid=' + chrome.runtime.id});
 
     window.close();
 }

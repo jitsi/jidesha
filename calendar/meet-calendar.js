@@ -752,7 +752,8 @@ function checkAndUpdateCalendar() {
         if(!c.isButtonPresent()) {
             // popup adds autoCreateMeeting param when open directly event
             // create page
-            if (findGetParameter('autoCreateMeeting')) {
+            if (findGetParameter('autoCreateMeeting')
+                && findGetParameter('extid') === chrome.runtime.id) {
                 c.scheduleAutoCreateMeeting = true;
             }
 
