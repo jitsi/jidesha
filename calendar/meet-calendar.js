@@ -177,7 +177,11 @@ class EventContainer {
 
         container.addClass('button_container');
         container.append(
-            '<div id="jitsi_button"><a href="#" style="color: white"></a></div>');
+            '<div id="jitsi_button" ' +
+                'class="goog-inline-block jfk-button jfk-button-action ' +
+                    'jfk-button-clear-outline">' +
+                '<a href="#" style="color: white"></a>' +
+            '</div>');
         description.update(this.location);
     }
 }
@@ -357,13 +361,11 @@ class Description {
      */
     updateButtonURL() {
         try {
-            $('#jitsi_button').addClass('join');
             var button = $('#jitsi_button a');
-            button.html("Join " + LOCATION_TEXT + " now");
+            button.html("Join your " + LOCATION_TEXT + " now");
             button.off('click');
             button.attr('href', BASE_URL + this.event.meetingId);
             button.attr('target', '_new');
-            button.attr('style', '{color:blue}');
         } catch (e) {
             console.log(e);
         }
@@ -759,6 +761,59 @@ function checkAndUpdateCalendar() {
 
             c.update();
         }
+
+        // Listen for mutations (showing the bubble), for quick adding events
+        var body = document.querySelector('body');
+        new MutationObserver(function() {
+            var quickAddDialog = $('.bubble');
+            if (quickAddDialog.length >= 1) {
+                // schedule execution, give time to all mutation observers
+                // to do their job, we try to add our button in the dialog
+                // when all other content had been added
+                setTimeout(function () {
+                    var quickAddDialogContainer
+                        = $(".bubblecontent .event-create-container");
+                    // skip if our button is already added
+                    if(quickAddDialogContainer.length < 1
+                        || $('#jitsi_button_quick_add').length != 0) {
+                        return;
+                    }
+
+                    var buttonsRow
+                        = $('.bubblecontent .event-create-container > .action-tile');
+                    if (buttonsRow.length < 1) {
+                        return;
+                    }
+
+                    var numberOfButtons
+                        = buttonsRow.find('.split-tile-right').length;
+                    var lastButtonGroup
+                        = buttonsRow.find('.split-tile-right:last');
+
+                    var jitsiQuickAddButton = $(
+                        '<div class="split-tile-right" style="float:left">' +
+                            '<div class="tile-content" ' +
+                                 'style="height: 30px; line-height: 30px;position: relative;">' +
+                                '<div class="right-actions" ' +
+                                     'style="display: inline-block;float: right;margin-right: -16px;">' +
+                                    '<div id="jitsi_button_quick_add" ' +
+                                         'class="goog-inline-block jfk-button jfk-button-action jfk-button-clear-outline" ' +
+                                         'style="left: ' + (numberOfButtons > 1 ? '10' : '0') + 'px;">' +
+                                        'Add a ' + LOCATION_TEXT +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>');
+                    lastButtonGroup.before(jitsiQuickAddButton);
+                    jitsiQuickAddButton.on('click', function(e) {
+                        c.scheduleAutoCreateMeeting = true;
+                        $('div.edit-button').click();
+                    });
+                }, 100);
+            }
+        }).observe(
+            body,
+            {attributes: false, childList: true, characterData: false});
     }
 }
 
