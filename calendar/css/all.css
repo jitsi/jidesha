@@ -45,3 +45,9 @@
     margin-left: 4px;
     margin-top: 4px;
 }
+
+.jitsi_ms_button {
+    background: transparent url('chrome-extension://__MSG_@@extension_id__/jitsi-logo-blue.svg') no-repeat;
+    width: 20px;
+    height: 20px;
+}

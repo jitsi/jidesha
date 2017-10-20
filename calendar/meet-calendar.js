@@ -771,7 +771,7 @@ class G2Description extends Description {
      */
     get element() {
         var description = $('#xDescIn > [role="textbox"]');
-        if (!description) {
+        if (!description || description.length == 0) {
             // maybe it is not editable
             description = $('#xDesc > div');
             description.notEditable = true;
@@ -868,10 +868,10 @@ class MSLiveEvent extends EventContainer {
      */
     update() {
         if ($("div[aria-label='Event compose form']").is(":visible")) {
-            this.updateMeetingId();
-
-            if(!this.isButtonPresent())
+            if(!this.isButtonPresent()) {
+                this.updateMeetingId();
                 this.addJitsiButton();
+            }
         }
     }
 
@@ -888,8 +888,8 @@ class MSLiveEvent extends EventContainer {
      * @returns {*}
      */
     get buttonContainer() {
-        var container
-            = $("span[id='MeetingCompose.LocationInputLabel']").parent();
+        var container = $("span[id='MeetingCompose.LocationInputLabel']")
+            .parent().parent();
         if(container.length == 0)
             return null;
         return container;
@@ -903,6 +903,33 @@ class MSLiveEvent extends EventContainer {
         if (!this.descriptionInstance)
             this.descriptionInstance = new MSLiveDescription(this);
         return this.descriptionInstance;
+    }
+
+    /**
+     * Adds the jitsi button in buttonContainer.
+     */
+    addJitsiButton() {
+        var container = this.buttonContainer;
+        if (!container)
+            return;
+
+        var description = this.description;
+
+        let newRow = $(
+            '<li>\
+                <button type="button" class="_cx_q2 o365button">\
+                    <button type="button" \
+                            class="_cx_t2 _cx_r2 o365button" \
+                            aria-labelledby="_ariaId_81"> \
+                        <span class = "_fc_3 csimg owaimg jitsi_ms_button"></span> \
+                        <span class = "_fc_4 _fc_2 ms-font-s ms-font-weight-semibold ms-font-color-themePrimary" \
+                              id = "jitsi_button"></span> \
+                    </button> \
+                </button> \
+            </li>'
+        );
+        newRow.insertAfter(container);
+        description.update(this.location);
     }
 }
 
@@ -955,6 +982,41 @@ class MSLiveDescription extends Description {
         textToInsert = textToInsert.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
         this.el.html(this.value + textToInsert);
+    }
+
+    /**
+     * Updates the initial button text and click handler when there is
+     * no meeting scheduled.
+     */
+    updateInitialButtonURL(location) {
+        var button = $('#jitsi_button');
+        button.html('Add a ' + LOCATION_TEXT);
+
+        button.parent().off('click');
+        button.parent().on('click', e => {
+            e.preventDefault();
+
+            this.clickAddMeeting(false, location);
+        });
+    }
+
+    /**
+     * Updates the url for the button.
+     */
+    updateButtonURL() {
+        try {
+            var button = $('#jitsi_button');
+            button.html("Join your " + LOCATION_TEXT + " now");
+
+            button.parent().off('click');
+            button.parent().on('click', e => {
+                e.preventDefault();
+
+                window.open(BASE_URL + this.event.meetingId, '_blank');
+            });
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 
