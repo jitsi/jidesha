@@ -23,3 +23,25 @@
     text-indent: 20px;
     padding-left: 4px;
 }
+
+.jitsi_quick_add_icon {
+    background: transparent url('chrome-extension://__MSG_@@extension_id__/jitsi-logo-grey.svg') no-repeat;
+    background-size: contain;
+    height: 16px;
+    width: 16px;
+    margin-left: 4px;
+    margin-top: 8px;
+}
+
+.jitsi_quick_add_text_size {
+    font-size: 14px
+}
+
+.jitsi_edit_page_icon {
+    background: transparent url('chrome-extension://__MSG_@@extension_id__/jitsi-logo-grey.svg') no-repeat;
+    background-size: contain;
+    height: 20px;
+    width: 20px;
+    margin-left: 4px;
+    margin-top: 4px;
+}

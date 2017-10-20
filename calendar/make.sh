@@ -12,6 +12,7 @@ cp -r css target/content
 cp ../chrome/background.js target/content
 cp ../chrome/*.png target/content
 cp *.png target/content
+cp *.svg target/content
 cp *.js target/content
 cp *.html target/content
 

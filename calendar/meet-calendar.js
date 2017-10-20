@@ -31,6 +31,8 @@ class EventContainer {
         var eventEditPage = document.querySelector('#maincell #coverinner');
         if (eventEditPage)
             return new GEvent(eventEditPage);
+        else if (document.querySelector('body').dataset.viewfamily)
+            return new G2Event(document.querySelector('body'));
         else
             return new MSLiveEvent();
     }
@@ -102,12 +104,15 @@ class EventContainer {
         }
 
         var inviteText;
-        if (this.location)
+        if (this.location && this.location.text)
             inviteText = this.location.text;
         else
             inviteText = this.description.value;
 
-        var ix = inviteText.indexOf(BASE_URL);
+        var ix = -1;
+        if (inviteText) {
+            ix = inviteText.indexOf(BASE_URL);
+        }
         var url;
         if (ix != -1 && (url = inviteText.substring(ix)) && url.length > 0) {
             let resMeetingId = url.substring(BASE_URL.length);
@@ -221,12 +226,14 @@ class Description {
         // checks whether description was updated.
         if (this.element != undefined) {
             var descriptionContainsURL =
-                (this.value.length >= 1 && this.value.indexOf(BASE_URL) !== -1);
+                (this.value
+                    && this.value.length >= 1
+                    && this.value.indexOf(BASE_URL) !== -1);
             isDescriptionUpdated =
-                descriptionContainsURL ||
-                // checks whether there is the generated name in the location input
-                // if there is a location
-                (location != null
+                descriptionContainsURL
+                // checks whether there is the generated name in the location
+                // input if there is a location
+                || (location != null
                     && location.text.indexOf(LOCATION_TEXT) != -1);
         }
 
@@ -235,14 +242,7 @@ class Description {
             this.updateButtonURL();
         } else {
             // update button as event description has no meeting set
-            var button = $('#jitsi_button a');
-            button.html('Add a ' + LOCATION_TEXT);
-            button.attr('href', '#');
-            button.on('click', e => {
-                e.preventDefault();
-
-                this.clickAddMeeting(isDescriptionUpdated, location);
-            });
+            this.updateInitialButtonURL(location);
         }
     }
 
@@ -278,8 +278,9 @@ class Description {
             if (location)
                 location.addLocationText(
                     LOCATION_TEXT + ' - ' + BASE_URL + this.event.meetingId);
+        } else {
+            this.updateButtonURL();
         }
-        this.updateButtonURL();
     }
 
     /**
@@ -354,6 +355,20 @@ class Description {
         }
 
         return inviteText;
+    }
+
+    /**
+     * Updates the initial button text and click handler when there is
+     * no meeting scheduled.
+     */
+    updateInitialButtonURL(location) {
+        var button = $('#jitsi_button a');
+        button.html('Add a ' + LOCATION_TEXT);
+        button.attr('href', '#');
+        button.on('click', e => {
+            e.preventDefault();
+            this.clickAddMeeting(false, location);
+        });
     }
 
     /**
@@ -561,6 +576,279 @@ class GDescription extends Description {
         var changeEvt1 = document.createEvent("HTMLEvents");
         changeEvt1.initEvent('change', false, true);
         this.el.dispatchEvent(changeEvt1);
+    }
+}
+
+/**
+ * The new google calendar specific implementation of the event page.
+ */
+class G2Event extends EventContainer {
+    constructor(eventEditPage) {
+        super();
+
+        this.container = eventEditPage;
+    }
+
+    /**
+     * Updates content (adds the button if is not there).
+     * This is the entry point for all page modifications.
+     */
+    update() {
+        // we want to trigger all the logic only when we have enough elements
+        // on the page, as the new interface is loading live and some elements
+        // are missing when directly go the event edit page
+        // we require the notifications element and location or description
+        // element
+        if ($('#xNtList').length != 0    // notifications
+            && (
+                $("#xLocIn").length != 0 // editable location
+                || $('#xOnCal').length != 0     // readonly location
+                || $('#xDescIn').length != 0    // editable description
+                || $('#xDesc').length != 0      // readonly description
+            )
+            && !this.isButtonPresent()) {
+            this.updateMeetingId();
+            this.addJitsiButton();
+        }
+    }
+
+    /**
+     * The event location.
+     * @returns {GLocation}
+     */
+    get location() {
+        if (!this.locationInstance) {
+            this.locationInstance = new G2Location();
+        }
+        return this.locationInstance;
+    }
+
+    /**
+     * The button container holding jitsi button.
+     * @returns {*}
+     */
+    get buttonContainer() {
+
+        // we will create a new raw to place the button
+        // this row will be before the notifications row
+        let neighbor = $('#xNtList').parent();
+        if(neighbor.length == 0){
+            return null;
+        }
+
+        let buttonContainer = $('#jitsi_button_container');
+        if (buttonContainer.length !== 0) {
+            return buttonContainer.find('content');
+        }
+
+        let newRow = $(
+            '<div class = "FrSOzf">\
+                <div class = "tzcF6">\
+                    <div class = "DPvwYc jitsi_edit_page_icon"/>\
+                </div>\
+                <div class = "j3nyw">\
+                    <div class = "BY5aAd">\
+                        <div role = "button" \
+                            class = "O0WRkf zZhnYe e3Duub C0oVfc M9Bg4d" \
+                            id="jitsi_button_container">\
+                            <content class = "CwaK9">\
+                                <span id="jitsi_button" \
+                                      class="RveJvd snByac">\
+                                </span>\
+                            </content>\
+                        </div>\
+                    </div>\
+                </div>\
+            </div>');
+        newRow.insertBefore(neighbor);
+
+        return newRow.find('content');
+    }
+
+    /**
+     * Adds the jitsi button in buttonContainer.
+     */
+    addJitsiButton() {
+        var container = this.buttonContainer;
+        if (!container)
+            return false;
+
+        this.description.update(this.location);
+    }
+
+    /**
+     * The event description.
+     * @returns {GDescription}
+     */
+    get description() {
+        if (!this.descriptionInstance)
+            this.descriptionInstance = new G2Description(this);
+        return this.descriptionInstance;
+    }
+}
+
+/**
+ * The google calendar specific implementation of the location field in the
+ * event page.
+ */
+class G2Location extends Location {
+
+    _getLocationElement() {
+        var elem = $("#xLocIn").find("#xLocIn");
+
+        if (elem.length === 0) {
+            // this is the case where location is not editable
+            let element = $('#xOnCal')[0];
+
+            if (!element) {
+                return undefined;
+            }
+
+            elem = element;
+            elem.val = function () {
+                return element.innerHTML;
+            }
+        }
+
+        return elem;
+    }
+
+    /**
+     * The text from the location input field.
+     * @returns {*}
+     */
+    get text() {
+        var e = this._getLocationElement();
+
+        if (e)
+            return e.val();
+        else
+            return undefined;
+    }
+
+    /**
+     * Adds text to location input.
+     * @param text
+     */
+    addLocationText(text){
+        var elem = $("#xLocIn").find("#xLocIn");
+
+        // in case this element is missing, means we cannot edit the text
+        if (elem.length === 0)
+            return;
+
+        // Set the location if there is content
+        var locationNode = elem[0];
+        if (locationNode) {
+            locationNode.focus(); // Focus needed to make a simulation of keying in.
+            elem.attr(
+                'value',
+                locationNode.value == '' ?
+                    text : locationNode.value + ', ' + text);
+            locationNode.dispatchEvent(getKeyboardEvent('input'));
+            // tried many combinations and cannot make it reliably working
+            // in some cases hovering over the input will make it save,
+            // otherwise text is seen in the input but is not saved after
+            // clicking save
+            window.setTimeout(function(){
+                locationNode.focus();
+                elem.val(elem.val()+ " ");
+                locationNode.dispatchEvent(getKeyboardEvent('input'));
+            },1000);
+        }
+    }
+}
+
+/**
+ * The google calendar specific implementation of the description textarea in
+ * the event page.
+ */
+class G2Description extends Description {
+
+    /**
+     * The html element.
+     * @returns {*}
+     */
+    get element() {
+        var description = $('#xDescIn > [role="textbox"]');
+        if (!description) {
+            // maybe it is not editable
+            description = $('#xDesc > div');
+            description.notEditable = true;
+        }
+
+        return description;
+    }
+
+    /**
+     * The text value of the description.
+     */
+    get value() {
+        return this.element.text();
+    }
+
+    /**
+     * Adds text to the description.
+     * @param text
+     */
+    addDescriptionText(text){
+        var el = this.element;
+        if (el.notEditable)
+            return;
+
+        var descriptionNode = el[0];
+        descriptionNode.dispatchEvent(getKeyboardEvent('keydown'));
+
+        // format new lines
+        var textToInsert = text.replace(/(?:\r\n|\r|\n)/g, '<br />');
+
+        // // if there is already text in the description append on new line
+        if (el.text().length > 0) {
+            el.append('<br/><br/>');
+        }
+        el.append(textToInsert);
+
+        descriptionNode.dispatchEvent(getKeyboardEvent('input'));
+        descriptionNode.dispatchEvent(getKeyboardEvent('keyup'));
+    }
+
+    /**
+     * Updates the initial button text and click handler when there is
+     * no meeting scheduled.
+     */
+    updateInitialButtonURL(location) {
+        var button = $('#jitsi_button');
+        button.html('Add a ' + LOCATION_TEXT);
+
+        var container = this.event.buttonContainer;
+
+        container.parent().off('click');
+        container.parent().on('click', e => {
+            e.preventDefault();
+
+            this.clickAddMeeting(false, location);
+        });
+    }
+
+    /**
+     * Updates the url for the button.
+     */
+    updateButtonURL() {
+        try {
+            var button = $('#jitsi_button');
+            button.html("Join your " + LOCATION_TEXT + " now");
+
+            var container = this.event.buttonContainer;
+
+            container.parent().off('click');
+            container.parent().on('click', e => {
+                e.preventDefault();
+
+                window.open(BASE_URL + this.event.meetingId, '_blank');
+            });
+        } catch (e) {
+            console.log(e);
+        }
     }
 }
 
@@ -817,4 +1105,103 @@ function checkAndUpdateCalendar() {
     }
 }
 
-checkAndUpdateCalendar();
+/**
+ * Checks whether it is ok to add the button to current page
+ * in case of new google calendar interface
+ */
+function checkAndUpdateCalendarG2() {
+    var MutationObserver
+        = window.MutationObserver || window.WebKitMutationObserver;
+    var c = EventContainer.getInstance();
+    if (c) {
+
+        // anyway try to add the button, this is the case when directly going
+        // to create event page
+        if(document.querySelector('body').dataset.viewfamily === 'EVENT_EDIT'
+            && !c.isButtonPresent()) {
+            // popup adds autoCreateMeeting param when open directly event
+            // create page
+            if (findGetParameter('autoCreateMeeting')
+                && findGetParameter('extid') === chrome.runtime.id) {
+                c.scheduleAutoCreateMeeting = true;
+            }
+
+            c.update();
+        }
+
+        // Listen for mutations (showing the bubble), for quick adding events
+        var body = document.querySelector('body');
+        new MutationObserver(function(mutations) {
+
+            // the main calendar view
+            if (document.querySelector('body').dataset.viewfamily === 'EVENT') {
+                mutations.forEach(function (mutation) {
+                    var mel = mutation.addedNodes[0];
+                    var newElement = mel && mel.outerHTML;
+
+                    if (newElement
+                        && (newElement.search('role=\"dialog\"') !== -1)) {
+
+                        // skip if our button is already added
+                        if ($('#jitsi_button_quick_add').length != 0) {
+                            return;
+                        }
+
+                        var tabEvent = $(mel).find("#tabEvent");
+                        if (tabEvent.length > 0) {
+                            var jitsiQuickAddButton = $(
+                                '<content class="" role="tabpanel" id="jitsi_button_quick_add_content"> \
+                                    <div class="LFtY4d">\
+                                        <div class="VI7fAf">\
+                                            <div class="DPvwYc QusFJf jitsi_quick_add_icon"/>\
+                                        </div>\
+                                        <div class="mH89We">\
+                                            <div role="button" \
+                                                 class="O0WRkf zZhnYe e3Duub C0oVfc" \
+                                                 id="jitsi_button_quick_add">\
+                                                <content class="CwaK9">\
+                                                    <span class="RveJvd snByac jitsi_quick_add_text_size">\
+                                                        ADD A ' + LOCATION_TEXT + '\
+                                                    </span>\
+                                                </content>\
+                                            </div>\
+                                        </div>\
+                                    </div>\
+                                </content>');
+
+                            $(tabEvent.parent()).append(jitsiQuickAddButton);
+
+                            var clickHandler
+                                = jitsiQuickAddButton.find(
+                                    '#jitsi_button_quick_add');
+                            clickHandler.on('click', function (e) {
+                                c.scheduleAutoCreateMeeting = true;
+                                $('div[role="button"][jsname="rhPddf"]').click();
+                            });
+
+                            return;
+                        }
+                    }
+                });
+            } else if (document.querySelector('body').dataset.viewfamily
+                === 'EVENT_EDIT') {
+                c.update();
+            }
+        }).observe(
+            body, {
+                attributes: false,
+                childList: true,
+                characterData: false,
+                subtree : true
+            });
+    }
+}
+
+if (document.querySelector('body').dataset.viewfamily) {
+    // this is google calendar new interface
+    checkAndUpdateCalendarG2();
+} else {
+    // google calendar classic or outlook
+    checkAndUpdateCalendar();
+}
+
