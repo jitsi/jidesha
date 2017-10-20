@@ -104,15 +104,24 @@ class EventContainer {
         }
 
         var inviteText;
-        if (this.location && this.location.text)
+        var ix = -1;
+
+        // checking location
+        if (this.location && this.location.text) {
             inviteText = this.location.text;
-        else
+
+            if (inviteText)
+                ix = inviteText.indexOf(BASE_URL);
+        }
+
+        // if nothing found let's check description
+        if (ix == -1) {
             inviteText = this.description.value;
 
-        var ix = -1;
-        if (inviteText) {
-            ix = inviteText.indexOf(BASE_URL);
+            if (inviteText)
+                ix = inviteText.indexOf(BASE_URL);
         }
+
         var url;
         if (ix != -1 && (url = inviteText.substring(ix)) && url.length > 0) {
             let resMeetingId = url.substring(BASE_URL.length);
