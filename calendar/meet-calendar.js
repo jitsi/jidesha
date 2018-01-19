@@ -858,6 +858,10 @@ class G2Description extends Description {
             container.parent().on('click', e => {
                 e.preventDefault();
 
+                // call updateMeetingId, the case where somebody edited location
+                // and then click join now before saving
+                this.event.updateMeetingId();
+
                 window.open(BASE_URL + this.event.meetingId, '_blank');
             });
         } catch (e) {
@@ -1003,7 +1007,7 @@ class MSLiveDescription extends Description {
      * no meeting scheduled.
      */
     updateInitialButtonURL(location) {
-        var button = $('#jitsi_button');
+        let button = $('#jitsi_button');
         button.html('Add a ' + LOCATION_TEXT);
 
         button.parent().off('click');
