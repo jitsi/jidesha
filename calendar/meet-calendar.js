@@ -805,17 +805,18 @@ class G2Description extends Description {
      * @param text
      */
     addDescriptionText(text){
-        var el = this.element;
+        let el = this.element;
         if (el.notEditable)
             return;
 
-        var descriptionNode = el[0];
+        let descriptionNode = el[0];
         descriptionNode.dispatchEvent(getKeyboardEvent('keydown'));
+        descriptionNode.dispatchEvent(getKeyboardEvent('keypress'));
 
         // format new lines
-        var textToInsert = text.replace(/(?:\r\n|\r|\n)/g, '<br />');
+        let textToInsert = text.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
-        // // if there is already text in the description append on new line
+        // if there is already text in the description append on new line
         if (el.text().length > 0) {
             el.append('<br/><br/>');
         }
@@ -830,10 +831,10 @@ class G2Description extends Description {
      * no meeting scheduled.
      */
     updateInitialButtonURL(location) {
-        var button = $('#jitsi_button');
+        let button = $('#jitsi_button');
         button.html('Add a ' + LOCATION_TEXT);
 
-        var container = this.event.buttonContainer;
+        let container = this.event.buttonContainer;
 
         container.parent().off('click');
         container.parent().on('click', e => {
