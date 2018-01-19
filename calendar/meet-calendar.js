@@ -243,6 +243,7 @@ class Description {
                 // checks whether there is the generated name in the location
                 // input if there is a location
                 || (location != null
+                    && location.text
                     && location.text.indexOf(LOCATION_TEXT) != -1);
         }
 
