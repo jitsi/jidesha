@@ -687,7 +687,7 @@ class G2Event extends EventContainer {
 
     /**
      * The event description.
-     * @returns {GDescription}
+     * @returns {G2Description}
      */
     get description() {
         if (!this.descriptionInstance)
@@ -702,8 +702,12 @@ class G2Event extends EventContainer {
  */
 class G2Location extends Location {
 
+    _getSelector() {
+        return $("#xLocIn input[jsname=YPqjbf][role=combobox]");
+    }
+
     _getLocationElement() {
-        var elem = $("#xLocIn").find("#xLocIn");
+        let elem = this._getSelector();
 
         if (elem.length === 0) {
             // this is the case where location is not editable
@@ -727,7 +731,7 @@ class G2Location extends Location {
      * @returns {*}
      */
     get text() {
-        var e = this._getLocationElement();
+        let e = this._getLocationElement();
 
         if (e)
             return e.val();
@@ -740,19 +744,19 @@ class G2Location extends Location {
      * @param text
      */
     addLocationText(text){
-        var elem = $("#xLocIn").find("#xLocIn");
+        let elem = this._getSelector();
 
         // in case this element is missing, means we cannot edit the text
         if (elem.length === 0)
             return;
 
         // Set the location if there is content
-        var locationNode = elem[0];
+        let locationNode = elem[0];
         if (locationNode) {
             locationNode.focus(); // Focus needed to make a simulation of keying in.
             elem.attr(
                 'value',
-                locationNode.value == '' ?
+                locationNode.value === '' ?
                     text : locationNode.value + ', ' + text);
             locationNode.dispatchEvent(getKeyboardEvent('input'));
             // tried many combinations and cannot make it reliably working
