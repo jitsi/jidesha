@@ -12,6 +12,7 @@
 
 #jitsi_button {
     min-width: 60px;
+    line-height: 24px;
 }
 
 #jitsi_button a {
@@ -34,7 +35,8 @@
 }
 
 .jitsi_quick_add_text_size {
-    font-size: 14px
+    font-size: 14px;
+    line-height: 24px;
 }
 
 .jitsi_edit_page_icon {
