@@ -659,7 +659,7 @@ class G2Event extends EventContainer {
                 <div class = "j3nyw">\
                     <div class = "BY5aAd">\
                         <div role = "button" \
-                            class = "O0WRkf zZhnYe e3Duub C0oVfc M9Bg4d" \
+                            class = "uArJ5e UQuaGc Y5sE8d" \
                             id="jitsi_button_container">\
                             <content class = "CwaK9">\
                                 <span id="jitsi_button" \
@@ -1232,17 +1232,17 @@ function checkAndUpdateCalendarG2() {
                         if (tabEvent.length > 0) {
                             var jitsiQuickAddButton = $(
                                 '<content class="" role="tabpanel" id="jitsi_button_quick_add_content"> \
-                                    <div class="LFtY4d">\
-                                        <div class="VI7fAf">\
+                                    <div class="fy8IH poWrGb">\
+                                        <div class="FkXdCf HyA7Fb">\
                                             <div class="DPvwYc QusFJf jitsi_quick_add_icon"/>\
                                         </div>\
                                         <div class="mH89We">\
                                             <div role="button" \
-                                                 class="O0WRkf zZhnYe e3Duub C0oVfc" \
+                                                 class="uArJ5e UQuaGc Y5sE8d" \
                                                  id="jitsi_button_quick_add">\
                                                 <content class="CwaK9">\
-                                                    <span class="RveJvd snByac jitsi_quick_add_text_size">\
-                                                        ADD A ' + LOCATION_TEXT + '\
+                                                    <span class="RveJvd jitsi_quick_add_text_size">\
+                                                        Add a ' + LOCATION_TEXT + '\
                                                     </span>\
                                                 </content>\
                                             </div>\
