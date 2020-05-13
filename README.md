@@ -1,9 +1,7 @@
 Jidesha
 =======
 
-A Chrome extension for calendar integration (Google Calendar and Office 365) and Screen Sharing in Jitsi Meet.
-
-Note: this extension relies on the Chrome [chooseDesktopMedia](https://developer.chrome.com/extensions/desktopCapture) API which requires HTTPS.
+A Chrome extension for calendar integration (Google Calendar and Office 365).
 
 ## How to create your own extension for your Jitsi Meet installation
 
@@ -39,15 +37,6 @@ CRX file into the "chrome://extensions" window.
 
 When Chrome shows it among your installed extensions,
 you will also see its *hash ID*.
-
-### Enter your extension's hash ID into your Jitsi Meet installation 
-
-You have to write the hash ID into the `desktopSharingChromeExtId`
-property of your `/etc/jitsi/meet/<your.server.com>-config.js`.
-This way, Jitsi Meet knows what to look for when the user clicks
-the "Share screen" button.
-
-Browser caches might need to be refreshed afterwards.
 
 ### Distribute your extension manually to your users
 

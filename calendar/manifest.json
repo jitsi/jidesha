@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Jitsi Meetings",
-  "description": "A simple extension that allows you to schedule Jitsi Meetings and stream your desktop into Jitsi conferences.",
+  "description": "A simple extension that allows you to schedule Jitsi Meetings.",
   "version": "0.2.8",
   "minimum_chrome_version": "34",
   "icons": {
@@ -9,12 +9,8 @@
     "48": "jitsi-logo-48x48.png",
     "128": "jitsi-logo-128x128.png"
   },
-  "background": {
-        "scripts": [ "background.js" ],
-        "persistent": true
-  },
   "permissions": [
-      "desktopCapture", "https://calendar.google.com/*"
+      "https://calendar.google.com/*"
   ],
   "externally_connectable": {
       "matches": [
