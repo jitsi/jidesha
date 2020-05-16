@@ -1112,8 +1112,7 @@ function checkAndUpdateCalendar() {
         if(!c.isButtonPresent()) {
             // popup adds autoCreateMeeting param when open directly event
             // create page
-            if (findGetParameter('autoCreateMeeting')
-                && findGetParameter('extid') === chrome.runtime.id) {
+            if (findGetParameter('autoCreateMeeting')) {
                 c.scheduleAutoCreateMeeting = true;
             }
 
@@ -1191,8 +1190,7 @@ function checkAndUpdateCalendarG2() {
             && !c.isButtonPresent()) {
             // popup adds autoCreateMeeting param when open directly event
             // create page
-            if (findGetParameter('autoCreateMeeting')
-                && findGetParameter('extid') === chrome.runtime.id) {
+            if (findGetParameter('autoCreateMeeting')) {
                 c.scheduleAutoCreateMeeting = true;
             }
 
