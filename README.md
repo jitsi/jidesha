@@ -3,6 +3,8 @@ Jidesha
 
 A Chrome extension for calendar integration (Google Calendar and Office 365).
 
+**THIS FILE IS FOR DEVELOPERS, NOT USERS!**
+
 ## How to create your own extension for your Jitsi Meet installation
 
 Each Jitsi Meet installation needs a customised extension.
