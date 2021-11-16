@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Jitsi Meetings",
-  "description": "A simple extension that allows you to schedule Jitsi Meetings.",
+  "name": "Brave Talk Meetings",
+  "description": "A simple extension that allows you to schedule meetings with Brave Talk.",
   "version": "0.2.8",
   "minimum_chrome_version": "34",
   "icons": {
@@ -14,7 +14,7 @@
   ],
   "externally_connectable": {
       "matches": [
-        "*://meet.jit.si/*"
+        "*://talk.brave.com/*"
       ]
   },
   "content_scripts": [
@@ -33,7 +33,7 @@
     "jitsi-logo-grey.svg"
   ],
   "browser_action": {
-    "default_title": "Create Jitsi Meetings",
+    "default_title": "Create Brave Talk Meetings",
     "default_popup": "popup.html"
   }
 }

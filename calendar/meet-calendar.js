@@ -1,6 +1,6 @@
-const BASE_DOMAIN = "meet.jit.si";
+const BASE_DOMAIN = "talk.brave.com";
 const BASE_URL = "https://" + BASE_DOMAIN + "/";
-const APP_NAME = "Jitsi";
+const APP_NAME = "Brave Talk";
 const NUMBER_RETRIEVE_SCRIPT = false;
 const CONFERENCE_MAPPER_SCRIPT = false;
 

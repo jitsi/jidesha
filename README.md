@@ -6,7 +6,10 @@ A Chrome extension for calendar integration (Google Calendar and Office 365).
 ## How to create your own extension for your Jitsi Meet installation
 
 Each Jitsi Meet installation needs a customised extension.
-There is only one small JSON file to adapt. You have
+There are two files you want to edit,
+in addition to updating the icon assets.
+
+You have
 to create the extension and distribute it, either through
 Google Chrome's Web Store or by telling your users how to
 install the CRX file.
@@ -14,34 +17,53 @@ install the CRX file.
 ### Create the extension
 
 Edit the `manifest.json` file. You must adapt the `externally_connectable`
-URL:
+URL, e.g.,
 
     "matches": [
-        "*://your.server.com/*"
+        "*://talk.brave.com/*"
     ]
 
 Do not include any port information.
 
-You might also want to edit the name, the description, the version or
-to replace the icons.
+In addition,
+you probably want to edit `name`, `description`, and `default_title` properties.
 
-Then, according to https://developer.chrome.com/extensions/packaging ,
-go inside Chrome to "chrome://extensions", click on the Developer Mode,
-and "Pack extension". The result is a CRX file and, if you do this for
-the first time, a private key used for later updates.
+Then edit the `meet-calendar.js` file to update the `BASE_DOMAIN` and `APP_NAME` properties.
 
-### Install your own extension
+Finally, you may wish to replace the `.png` and `.svg` media assets.
 
-Install your own extension into your Chrome. One way is to drag the
-CRX file into the "chrome://extensions" window.
+### Test the Extension
 
-When Chrome shows it among your installed extensions,
+Go to "brave://extensions",
+enable Developer Mode,
+click on "Load unpacked",
+navigate to the directory containing `manifest.json`,
+and click on 'Select`.
+
+Now go to [Google Calendar](https://calendar.google.com/) and start the creation process for an appointment.
+Towards the bottom of the pop-up window, you should see a button with the icon to add a meeting".
+
+### Pack the Extension
+
+Then, according to the [documentation](https://developer.chrome.com/extensions/packaging),
+go inside the Brave Browser to "brave://extensions", enable Developer Mode,
+and "Pack extension".
+Under "Extension root directory",
+once again navigate to the directory containing `manifest.json`.
+
+If you are *not* modifying the extension, leave the second field ("Private key file") blank.
+Otherwise, navigate and select the `calendar.pem` file that was created when you first created the `.crx` file.
+
+You can now drag the `.crx` file onto the "brave://extensions" tab.
+(Be sure to remove the extension if you previously did "Load unpacked".)
+
+When the Brave Browser shows it among your installed extensions,
 you will also see its *hash ID*.
 
 ### Distribute your extension manually to your users
 
 You can send the CRX file to your users and tell them how to
 install it. For example, you might want to put it
-directly onto your Jitsi Meet server (webroot in `/usr/share/jitsi-meet`).
+directly onto your Jitsi Meet server, along with a link on the home page.
 This would only be helpful for downloading the extension, as
-Chrome will not allow a direct installation from your site.
+the Brave Browser will not allow a direct installation from your site.
