@@ -2,3 +2,6 @@
 /calendar/target
 
 .DS_STORE
+
+calendar.crx
+calendar.pem
