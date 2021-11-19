@@ -5,9 +5,9 @@
   "version": "0.2.8",
   "minimum_chrome_version": "34",
   "icons": {
-    "16": "jitsi-logo-16x16.png",
-    "48": "jitsi-logo-48x48.png",
-    "128": "jitsi-logo-128x128.png"
+    "16": "brave_talk_icon_16x.png",
+    "48": "brave_talk_icon_48x.png",
+    "128": "brave_talk_icon_128x.png"
   },
   "permissions": [
       "https://calendar.google.com/*"
@@ -27,10 +27,10 @@
     }
   ],
   "web_accessible_resources": [
-    "jitsi-logo-48x48.png",
-    "jitsi-logo-white-48x48.png",
-    "jitsi-logo-blue.svg",
-    "jitsi-logo-grey.svg"
+    "brave_talk_icon_48x.png",
+    "brave_talk_icon.svg",
+    "brave_talk_icon_white.svg",
+    "brave_talk_icon_gray.svg"
   ],
   "browser_action": {
     "default_title": "Create Brave Talk Meetings",
