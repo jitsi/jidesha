@@ -40,7 +40,7 @@
 }
 
 .jitsi_edit_page_icon {
-    background: transparent url('chrome-extension://__MSG_@@extension_id__/brave_talk_icon.svg') no-repeat;
+    background: transparent url('chrome-extension://__MSG_@@extension_id__/brave_talk_icon_48x.png') no-repeat;
     background-size: contain;
     height: 20px;
     width: 20px;
