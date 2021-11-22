@@ -1,4 +1,4 @@
-Jidesha
+Jidesha quitrk
 =======
 
 A Chrome extension for calendar integration (Google Calendar and Office 365).
