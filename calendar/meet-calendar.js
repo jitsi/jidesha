@@ -8,6 +8,14 @@ const CONFERENCE_MAPPER_SCRIPT = false;
 const LOCATION_TEXT = APP_NAME + ' Meeting';
 
 let generateRoomNameAsDigits = false;
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
 
 /**
  * The event page we will be updating.
@@ -1004,7 +1012,7 @@ class MSLiveDescription extends Description {
         // format new lines
         textToInsert = textToInsert.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
-        this.el.html(this.value + textToInsert);
+        this.el.html(escapeHtml(this.value) + textToInsert);
     }
 
     /**
