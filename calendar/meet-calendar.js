@@ -1,6 +1,6 @@
-const BASE_DOMAIN = "talk.brave.com";
+const BASE_DOMAIN = "meet.jit.si";
 const BASE_URL = "https://" + BASE_DOMAIN + "/";
-const APP_NAME = "Brave Talk";
+const APP_NAME = "Jitsi";
 const NUMBER_RETRIEVE_SCRIPT = false;
 const CONFERENCE_MAPPER_SCRIPT = false;
 
@@ -8,6 +8,14 @@ const CONFERENCE_MAPPER_SCRIPT = false;
 const LOCATION_TEXT = APP_NAME + ' Meeting';
 
 let generateRoomNameAsDigits = false;
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+}
 
 /**
  * The event page we will be updating.
@@ -651,25 +659,29 @@ class G2Event extends EventContainer {
             return buttonContainer.find('content');
         }
 
-        let newRow = $(
-            '<div class = "FrSOzf">\
-                <div class = "tzcF6">\
-                    <div class = "DPvwYc jitsi_edit_page_icon"/>\
-                </div>\
-                <div class = "j3nyw">\
-                    <div class = "BY5aAd">\
-                        <div role = "button" \
-                            class = "uArJ5e UQuaGc Y5sE8d" \
-                            id="jitsi_button_container">\
-                            <content class = "CwaK9">\
-                                <span id="jitsi_button" \
-                                      class="RveJvd snByac">\
-                                </span>\
-                            </content>\
-                        </div>\
-                    </div>\
-                </div>\
-            </div>');
+        const newRow = $('<div class = "FrSOzf" />')
+        newRow.append(`
+            <div class = "tzcF6">
+                <div class = "DPvwYc jitsi_edit_page_icon"/>
+            </div>
+        `)
+
+        newRow.append(`
+            <div class = "j3nyw">
+                <div class = "BY5aAd">
+                    <div role = "button"
+                        class = "uArJ5e UQuaGc Y5sE8d"
+                        id="jitsi_button_container">
+                        <content class = "CwaK9">
+                            <span id="jitsi_button"
+                                    class="RveJvd snByac">
+                            </span>
+                        </content>
+                    </div>
+                </div>
+            </div>
+        `)
+
         newRow.insertBefore(neighbor);
 
         return newRow.find('content');
@@ -1000,7 +1012,7 @@ class MSLiveDescription extends Description {
         // format new lines
         textToInsert = textToInsert.replace(/(?:\r\n|\r|\n)/g, '<br />');
 
-        this.el.html(this.value + textToInsert);
+        this.el.html(escapeHtml(this.value) + textToInsert);
     }
 
     /**
@@ -1230,30 +1242,31 @@ function checkAndUpdateCalendarG2() {
 
                         var tabEvent = $(mel).find("#tabEvent");
                         if (tabEvent.length > 0) {
-                            var jitsiQuickAddButton = $(
-                                '<content class="" role="tabpanel" id="jitsi_button_quick_add_content"> \
-                                    <div class="fy8IH poWrGb">\
-                                        <div class="FkXdCf HyA7Fb">\
-                                            <div class="DPvwYc QusFJf jitsi_quick_add_icon"/>\
-                                        </div>\
-                                        <div class="mH89We">\
-                                            <div role="button" \
-                                                 class="uArJ5e UQuaGc Y5sE8d" \
-                                                 id="jitsi_button_quick_add">\
-                                                <content class="CwaK9">\
-                                                    <span class="RveJvd jitsi_quick_add_text_size">\
-                                                        Add a ' + LOCATION_TEXT + '\
-                                                    </span>\
-                                                </content>\
-                                            </div>\
-                                        </div>\
-                                    </div>\
-                                </content>');
+                            const container = $('<content class="" role="tabpanel" id="jitsi_button_quick_add_content"><div class="fy8IH poWrGb"/></content>')
+                            $(tabEvent.parent()).append(container);
 
-                            $(tabEvent.parent()).append(jitsiQuickAddButton);
+                            container.children().first().append(`
+                                <div class="FkXdCf HyA7Fb">
+                                    <div class="DPvwYc QusFJf jitsi_quick_add_icon"/>
+                                </div>
+                            `)
+
+                            container.children().first().append(`
+                                <div class="mH89We">
+                                    <div role="button"
+                                        class="uArJ5e UQuaGc Y5sE8d"
+                                        id="jitsi_button_quick_add">
+                                        <content class="CwaK9">\
+                                            <span class="RveJvd jitsi_quick_add_text_size">
+                                                Add a ${LOCATION_TEXT}
+                                            </span>
+                                        </content>
+                                    </div>
+                                </div>
+                            `)
 
                             var clickHandler
-                                = jitsiQuickAddButton.find(
+                                = container.find(
                                     '#jitsi_button_quick_add');
                             clickHandler.on('click', function (e) {
                                 c.scheduleAutoCreateMeeting = true;
