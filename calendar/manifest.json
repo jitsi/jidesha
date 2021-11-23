@@ -10,7 +10,6 @@
     "128": "brave_talk_icon_128x.png"
   },
   "permissions": [
-      "https://calendar.google.com/*"
   ],
   "externally_connectable": {
       "matches": [
