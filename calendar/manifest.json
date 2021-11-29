@@ -28,8 +28,6 @@
   "web_accessible_resources": [
     "brave_talk_icon_48x.png",
     "brave_talk_icon.svg",
-    "brave_talk_icon_white.svg",
-    "brave_talk_icon_gray.svg"
   ],
   "browser_action": {
     "default_title": "Create Brave Talk Meetings",
