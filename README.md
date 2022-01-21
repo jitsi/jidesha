@@ -1,5 +1,4 @@
-Jidesha
-=======
+# Jidesha
 
 A Chrome extension for calendar integration (Google Calendar and Office 365).
 
@@ -36,10 +35,15 @@ Finally, you may wish to replace the `.png` and `.svg` media assets.
 
 ### Test the Extension
 
+Build this extension:
+
+    npm install
+    npm run build
+
 Go to "brave://extensions",
 enable Developer Mode,
 click on "Load unpacked",
-navigate to the directory containing `manifest.json`,
+navigate to the `dist` directory created by `npm run build`.
 and click on 'Select`.
 
 Now go to [Google Calendar](https://calendar.google.com/) and start the creation process for an appointment.
@@ -53,14 +57,14 @@ and "Pack extension".
 Under "Extension root directory",
 once again navigate to the directory containing `manifest.json`.
 
-If you are *not* modifying the extension, leave the second field ("Private key file") blank.
+If you are _not_ modifying the extension, leave the second field ("Private key file") blank.
 Otherwise, navigate and select the `calendar.pem` file that was created when you first created the `.crx` file.
 
 You can now drag the `.crx` file onto the "brave://extensions" tab.
 (Be sure to remove the extension if you previously did "Load unpacked".)
 
 When the Brave Browser shows it among your installed extensions,
-you will also see its *hash ID*.
+you will also see its _hash ID_.
 
 ### Distribute your extension manually to your users
 

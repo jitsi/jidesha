@@ -5,3 +5,7 @@
 
 calendar.crx
 calendar.pem
+
+build/
+node_modules/
+dist/
