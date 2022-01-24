@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "Brave Talk Meetings",
+  "description": "A simple extension that allows you to schedule meetings with Brave Talk.",
+  "version": "0.4.1",
+  "minimum_chrome_version": "34",
+  "icons": {
+    "16": "brave_talk_icon_16x.png",
+    "48": "brave_talk_icon_48x.png",
+    "128": "brave_talk_icon_128x.png"
+  },
+  "permissions": [],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://calendar.google.com/calendar/*"
+      ],
+      "js": [
+        "content_script.js",
+        "vendor.js"
+      ],
+      "css": [
+        "all.css"
+      ],
+      "all_frames": false,
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "brave_talk_icon_48x.png",
+        "brave_talk_icon.svg"
+      ],
+      "matches": [
+        "https://calendar.google.com/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_title": "Create Brave Talk Meetings",
+    "default_popup": "popup.html"
+  }
+}

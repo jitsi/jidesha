@@ -1,0 +1,57 @@
+.button_container {
+  position: relative;
+}
+
+.button_container.solo .hangouts_button {
+  display: none;
+}
+
+.button_container.solo #jitsi_button {
+  left: 0px;
+}
+
+#jitsi_button {
+  min-width: 60px;
+  line-height: 24px;
+  padding: 7px 16px;
+}
+
+#jitsi_button a {
+  display: block;
+  text-decoration: none;
+}
+
+.jitsi_quick_add_icon {
+  background: transparent
+    url("chrome-extension://__MSG_@@extension_id__/brave_talk_icon.svg")
+    no-repeat;
+  background-size: contain;
+  height: 16px;
+  width: 16px;
+  margin-left: 4px;
+  margin-top: 8px;
+}
+
+.jitsi_quick_add_text_size {
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.jitsi_edit_page_icon {
+  background: transparent
+    url("chrome-extension://__MSG_@@extension_id__/brave_talk_icon_48x.png")
+    no-repeat;
+  background-size: contain;
+  height: 20px;
+  width: 20px;
+  margin-left: 4px;
+  margin-top: 4px;
+}
+
+.jitsi_ms_button {
+  background: transparent
+    url("chrome-extension://__MSG_@@extension_id__/brave_talk_icon.svg")
+    no-repeat;
+  width: 20px;
+  height: 20px;
+}
