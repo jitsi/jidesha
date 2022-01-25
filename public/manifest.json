@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "Brave Talk Meetings",
   "description": "A simple extension that allows you to schedule meetings with Brave Talk.",
-  "version": "0.4.1",
-  "minimum_chrome_version": "34",
+  "version": "0.5.0",
+  "minimum_chrome_version": "97",
   "icons": {
     "16": "brave_talk_icon_16x.png",
     "48": "brave_talk_icon_48x.png",
