@@ -16,8 +16,7 @@
         "https://calendar.google.com/calendar/*"
       ],
       "js": [
-        "content_script.js",
-        "vendor.js"
+        "content_script.js"
       ],
       "css": [
         "all.css"

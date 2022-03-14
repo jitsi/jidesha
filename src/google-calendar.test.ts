@@ -1,5 +1,4 @@
 import * as gcal from "./google-calendar";
-import $ from "jquery";
 import fs from "fs";
 import path from "path";
 
@@ -43,19 +42,16 @@ it("should add button to quick add dialog", async () => {
   expect(document.getElementById("jitsi_button_quick_add")).toBeNull();
 
   // in real life, gcal ads a node with a dialog deep down inside
-  $(document.body).append(
-    `
-    <div>
-      <div role="dialog">
-        <span>This is the quick add dialog</span>
-        <div id="tabEvent">
-          This tab shows event details
-        </div>
+  const dialog = document.createElement("div");
+  dialog.innerHTML = `
+    <div role="dialog">
+      <span>This is the quick add dialog</span>
+      <div id="tabEvent">
+        This tab shows event details
       </div>
-
     </div>
-    `
-  );
+  `;
+  document.body.appendChild(dialog);
 
   // give the mutation observer a chance to run
   await waitForMutationObserversToFire();

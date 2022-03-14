@@ -2,7 +2,6 @@
 This file contains all the logic that interacts with the html of the google calendar site
  */
 
-import $ from "jquery";
 import { createRoom, generateNewRoomUrl, isBraveTalkUrl } from "./brave-talk";
 
 // we want to automatically add the brave talk meeting to
@@ -33,16 +32,17 @@ export function isGoogleCalendar(): boolean {
 // The "quick add" screen is the inline event creation dialog,
 // invoked usually by clicking the "create +" button. We add a button
 // here, and get it to invoke the full-screen "edit" mode where the full functionaltiy is.
-function addButtonToQuickAdd(quickAddDialog: JQuery<HTMLElement>) {
+function addButtonToQuickAdd(quickAddDialog: HTMLElement) {
   // skip if our button is already added
-  if ($("#jitsi_button_quick_add").length) {
+  if (document.querySelector("#jitsi_button_quick_add")) {
     return;
   }
-  const tabEvent = quickAddDialog.find("#tabEvent");
-  if (tabEvent.length) {
-    tabEvent.parent().append(
-      `
-    <content class="" role="tabpanel" id="jitsi_button_quick_add_content">
+  const tabEvent = quickAddDialog.querySelector("#tabEvent");
+  if (tabEvent) {
+    const tabPanel = document.createElement("content");
+    tabPanel.setAttribute("role", "tabpanel");
+    tabPanel.setAttribute("id", "jitsi_button_quick_add_content");
+    tabPanel.innerHTML = `
       <div class="fy8IH poWrGb">
         <div class="FkXdCf HyA7Fb">
           <div class="DPvwYc QusFJf jitsi_quick_add_icon"/>
@@ -59,15 +59,19 @@ function addButtonToQuickAdd(quickAddDialog: JQuery<HTMLElement>) {
           </content>
         </div>
       </div>
-    </content>
-    `
+    `;
+
+    tabEvent.parentElement?.appendChild(tabPanel);
+    const clickHandler = tabEvent.parentElement?.querySelector(
+      "#jitsi_button_quick_add"
     );
-    const clickHandler = tabEvent.parent().find("#jitsi_button_quick_add");
-    clickHandler.on("click", () => {
+    clickHandler?.addEventListener("click", () => {
       // this is clicking the "more options" button on the quick add dialog,
       // which causes the full screen event editor to appear
       scheduleAutoCreateMeeting = true;
-      $('div[role="button"][jsname="rhPddf"]').trigger("click");
+      document
+        .querySelector<HTMLElement>('div[role="button"][jsname="rhPddf"]')
+        ?.click();
     });
   }
 }
@@ -83,7 +87,11 @@ function isFullScreenEventButtonPresent(): boolean {
 // the value currently entered into the "location" text box
 function getLocationString(): string {
   return (
-    $("#xLocIn input[jsname=YPqjbf][role=combobox]").val()?.toString() ?? ""
+    document
+      .querySelector<HTMLInputElement>(
+        "#xLocIn input[jsname=YPqjbf][role=combobox]"
+      )
+      ?.value?.toString() ?? ""
   );
 }
 
@@ -108,23 +116,25 @@ async function setLocationString(newValue: string): Promise<void> {
 }
 
 /* This creates the row with icon and a button - with no text on it and no click handler */
-function getOrCreateButtonContainer(): JQuery<HTMLElement> | null {
+function getOrCreateButtonContainer(): HTMLElement | Element | null {
   // #xNtList is the notification list, we need to insert the button row before this.
   // If it's not there, the UI isn't ready to insert yet
-  const neighbor = $("#xNtList").parent();
-  if (!neighbor.length) {
+  const neighbor = document.querySelector("#xNtList")?.parentElement;
+  if (!neighbor) {
     return null;
   }
 
   // do we have an existing button in place?
-  const existingButton = $("#jitsi_button_container content");
-  if (existingButton.length) {
+  const existingButton = document.querySelector(
+    "#jitsi_button_container content"
+  );
+  if (existingButton) {
     return existingButton;
   }
 
-  const buttonRow = $(
-    `
-    <div class="FrSOzf">
+  const buttonRow = document.createElement("div");
+  buttonRow.className = "FrSOzf";
+  buttonRow.innerHTML = `
       <div class="tzcF6">
         <div class="DPvwYc jitsi_edit_page_icon"></div>
       </div>
@@ -142,12 +152,11 @@ function getOrCreateButtonContainer(): JQuery<HTMLElement> | null {
           </div>
         </div>
       </div>
-    </div>
-    `
-  );
-  buttonRow.insertBefore(neighbor);
+  `;
 
-  return buttonRow.find("content");
+  neighbor.parentElement?.insertBefore(buttonRow, neighbor);
+
+  return buttonRow.querySelector("content");
 }
 
 async function onAddMeetingClick() {
@@ -157,29 +166,37 @@ async function onAddMeetingClick() {
 
   createRoom(newRoomUrl);
 }
+
 /**
  * Updates the initial button text and click handler when there is
  * no meeting scheduled.
  */
 function updateToAddMeetingButton() {
-  $("#jitsi_button a")
-    .text("Add a Brave Talk meeting")
-    .attr("href", "#")
-    .on("click", (e) => {
-      e.preventDefault();
-      onAddMeetingClick();
-    });
+  const anchor = document.querySelector("#jitsi_button a");
+  if (anchor) {
+    anchor.textContent = "Add a Brave Talk meeting";
+    anchor.setAttribute("href", "#");
+    anchor.addEventListener(
+      "click",
+      (e) => {
+        e.preventDefault();
+        onAddMeetingClick();
+      },
+      { once: true }
+    );
+  }
 }
 
 /**
  * Updates the url for the button.
  */
 function updateToJoinMeetingButton(joinUrl: string) {
-  $("#jitsi_button a")
-    .text("Join your Brave Talk meeting now")
-    .off("click")
-    .attr("href", joinUrl)
-    .attr("target", "_new");
+  const button = document.querySelector("#jitsi_button a");
+  if (button) {
+    button.textContent = "Join your Brave Talk meeting now";
+    button.setAttribute("href", joinUrl);
+    button.setAttribute("target", "_new");
+  }
 }
 
 export function maintainButtonOnFullScreenEventEdit() {
@@ -187,10 +204,13 @@ export function maintainButtonOnFullScreenEventEdit() {
   // on the page, as the new interface is loading live and some elements
   // are missing when directly go the event edit page
   // we require the notifications element and location
+  const xNtList = document.querySelector("#xNtList");
+  const xLocIn = document.querySelector("#xLocIn");
+  const xOnCal = document.querySelector("#xOnCal");
   if (
-    $("#xNtList").length != 0 && // notifications
-    ($("#xLocIn").length != 0 || // editable location
-      $("#xOnCal").length != 0) &&
+    xNtList && // notifications
+    (xLocIn || // editable location
+      xOnCal) &&
     !isFullScreenEventButtonPresent()
   ) {
     /// add button
@@ -217,8 +237,17 @@ export function watchForChanges() {
     // in normal calendar mode, watch for the quick add popup
     if (viewFamily === "EVENT") {
       mutations.forEach((mutation) => {
-        const dlg = $(mutation.addedNodes).find('[role="dialog"]');
-        if (dlg.length) {
+        let dlg;
+        mutation.addedNodes.forEach((node) => {
+          const el =
+            node instanceof HTMLElement &&
+            node.querySelector("[role='dialog']");
+          if (el) {
+            dlg = el;
+            return;
+          }
+        });
+        if (dlg) {
           addButtonToQuickAdd(dlg);
         }
       });
