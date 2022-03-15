@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Brave Talk for Google Calendar",
   "description": "Schedule Brave Talk meetings directly from Google Calendar",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "minimum_chrome_version": "97",
   "icons": {
     "16": "brave_talk_icon_16x.png",

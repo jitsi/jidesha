@@ -42,26 +42,38 @@ function addButtonToQuickAdd(quickAddDialog: HTMLElement) {
     const tabPanel = document.createElement("content");
     tabPanel.setAttribute("role", "tabpanel");
     tabPanel.setAttribute("id", "jitsi_button_quick_add_content");
+
     tabPanel.innerHTML = `
       <div class="fy8IH poWrGb">
         <div class="FkXdCf HyA7Fb">
           <div class="DPvwYc QusFJf jitsi_quick_add_icon"/>
         </div>
       </div>
-      <div class="mH89We">
-        <div role="button"
-             class="uArJ5e UQuaGc Y5sE8d"
-             id="jitsi_button_quick_add">
-          <content class="CwaK9">
-            <span class="RveJvd jitsi_quick_add_text_size">
-              Add a Brave Talk meeting
-            </span>
-          </content>
+      <div class="kCyAyd">
+        <div class="mH89We l4V7wb">
+          <div role="button"
+              class="uArJ5e UQuaGc Y5sE8d"
+              id="jitsi_button_quick_add">
+            <content class="CwaK9 cDfbwb">
+              <span class="Fxmcue jitsi_quick_add_text_size">
+                Add a Brave Talk meeting
+              </span>
+            </content>
+          </div>
         </div>
       </div>
     `;
 
-    tabEvent.parentElement?.appendChild(tabPanel);
+    // if we can insert just before "descrption", lets do so,
+    // otherwise just append at the bottom of the tab
+    const description = tabEvent.querySelector("[jsname=hGaP9]");
+
+    if (description) {
+      description.insertAdjacentElement("beforebegin", tabPanel);
+    } else {
+      tabEvent.parentElement?.appendChild(tabPanel);
+    }
+
     const clickHandler = tabEvent.parentElement?.querySelector(
       "#jitsi_button_quick_add"
     );
