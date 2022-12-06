@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Jitsi Meetings",
   "description": "A simple extension that allows you to schedule Jitsi Meetings.",
   "version": "0.2.8",
@@ -9,7 +9,7 @@
     "48": "jitsi-logo-48x48.png",
     "128": "jitsi-logo-128x128.png"
   },
-  "permissions": [
+  "host_permissions": [
       "https://calendar.google.com/*"
   ],
   "externally_connectable": {
@@ -26,13 +26,19 @@
       "run_at" : "document_end"
     }
   ],
-  "web_accessible_resources": [
-    "jitsi-logo-48x48.png",
-    "jitsi-logo-white-48x48.png",
-    "jitsi-logo-blue.svg",
-    "jitsi-logo-grey.svg"
-  ],
-  "browser_action": {
+  "web_accessible_resources": [{
+    "matches": [
+      "https://calendar.google.com/*",
+      "https://outlook.live.com/*"
+    ],
+    "resources": [
+      "jitsi-logo-48x48.png",
+      "jitsi-logo-white-48x48.png",
+      "jitsi-logo-blue.svg",
+      "jitsi-logo-grey.svg"
+    ]
+  }],
+  "action": {
     "default_title": "Create Jitsi Meetings",
     "default_popup": "popup.html"
   }
