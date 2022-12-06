@@ -784,7 +784,7 @@ class G2Description extends Description {
      * @returns {*}
      */
     get element() {
-        var description = $('#xDescIn > [role="textbox"]');
+        var description = $('#xDescIn > [contenteditable="true"]');
         if (!description || description.length == 0) {
             // maybe it is not editable
             description = $('#xDesc > div');
@@ -1250,7 +1250,7 @@ function checkAndUpdateCalendarG2() {
                                     </div>\
                                 </content>');
 
-                            $(tabEvent.parent()).append(jitsiQuickAddButton);
+                            $(tabEvent).append(jitsiQuickAddButton);
 
                             var clickHandler
                                 = jitsiQuickAddButton.find(
