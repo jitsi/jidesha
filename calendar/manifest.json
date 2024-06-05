@@ -3,7 +3,7 @@
   "name": "Jitsi Meetings",
   "description": "A simple extension that allows you to schedule Jitsi Meetings.",
   "version": "0.2.8",
-  "minimum_chrome_version": "34",
+  "minimum_chrome_version": "88",
   "icons": {
     "16": "jitsi-logo-16x16.png",
     "48": "jitsi-logo-48x48.png",
