@@ -56,12 +56,15 @@
         }
 
     </style>
+    <script src="config.js"></script>
+    <script src="RandomUtil.js"></script>
+    <script src="RoomnameGenerator.js"></script>
     <script src="popup.js"></script>
 </head>
 <body>
     <div id="menu">
         <div tabindex="1">
-            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&autoCreateMeeting=true">
+            <a href="https://calendar.google.com/calendar/r/eventedit?action=TEMPLATE&autoCreateMeeting=true&details={MEET_DESCRIPTION}&location={MEET_LOCATION}&dates={DATETIME}%2F{DATETIME}">
                 Create Google Calendar meeting
             </a>
         </div>
