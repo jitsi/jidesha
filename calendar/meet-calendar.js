@@ -1090,7 +1090,7 @@ function findGetParameter(parameterName) {
     var result = null,
         tmp = [];
     location.search
-        .substr(1)
+        .slice(1)
         .split("&")
         .forEach(function (item) {
             tmp = item.split("=");
