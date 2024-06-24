@@ -654,7 +654,7 @@ class G2Event extends EventContainer {
         let newRow = $(
             '<div class = "FrSOzf">\
                 <div class = "tzcF6">\
-                    <div class = "DPvwYc jitsi_edit_page_icon"/>\
+                    <div class = "DPvwYc jitsi_edit_page_icon"></div>\
                 </div>\
                 <div class = "j3nyw">\
                     <div class = "BY5aAd">\
